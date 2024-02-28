@@ -10,7 +10,7 @@ bot = telebot.TeleBot(TOKEN)
 
 app = FastAPI()
 
-URL = ('https://cryptowalletbot.onrender.com/' +
+URL = ('https://englishteacherbot.onrender.com/' +
        '51b9e4b9cbd872e827c45f9db4a6c002611bd9a2437a4f278066282abc2f3a40')
 
 bot.remove_webhook()
