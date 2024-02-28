@@ -1,1 +1,3 @@
-TOKEN = "6729432471:AAGfGD7EPU6eKY3RFX709lZNGfG-pZzkRos"
+import os
+
+TOKEN = os.environ["TOKEN"]
