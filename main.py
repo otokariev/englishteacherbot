@@ -45,7 +45,7 @@ async def root():
     return {"message": "Welcome to English Teacher Bot"}
 
 
-@app.get('/view_dictionary')
+@app.get('/custom_dictionary')
 async def view_dictionary():
     try:
         with open(DICTIONARY, 'r', encoding='utf-8') as file:
@@ -94,6 +94,27 @@ def get_translation(message, word):
 
     with open(DICTIONARY, "w", encoding="utf-8") as file:
         json.dump(dictionary, file, ensure_ascii=False, indent=4)
+
+
+@bot.message_handler(commands=['delete'])
+def delete_word(message):
+    bot.send_message(message.chat.id, "Please enter the word you want to delete:")
+    bot.register_next_step_handler(message, check_delete_word)
+
+
+def check_delete_word(message):
+    word_to_delete = message.text.strip().upper()
+    if message.content_type == 'text' \
+            and not message.text.startswith('/') \
+            and word_to_delete in dictionary:
+        del dictionary[word_to_delete]
+        with open(DICTIONARY, "w", encoding="utf-8") as file:
+            json.dump(dictionary, file, ensure_ascii=False, indent=4)
+        bot.send_message(message.chat.id,
+                         f"The word '{word_to_delete}' has been successfully deleted from the dictionary.")
+    else:
+        bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
+                                          "Back to menu ⭐ /menu ⭐")
 
 
 @bot.message_handler(commands=['top'])
