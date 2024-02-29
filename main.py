@@ -63,7 +63,7 @@ def view_words(message):
     if dictionary:
         words_list = "\n".join([f"{word}: {translation}" for word, translation in list(dictionary.items())[-50:]])
         bot.send_message(message.chat.id,
-                         f'List of words with translations:\n\n{words_list}\n\nBack to menu ⭐ /menu ⭐')
+                         f'List of words with translations:\n\n{words_list}\n\nBack to dev menu ⭐ /dev ⭐')
     else:
         bot.send_message(message.chat.id, "The dictionary is empty!")
 
@@ -79,7 +79,7 @@ def check_word(message):
     if word in dictionary:
         bot.send_message(message.chat.id,
                          f" ❌ The word '{word}' already exists in the dictionary ❌\n"
-                         "Back to menu ⭐ /menu ⭐")
+                         "Back to dev menu ⭐ /dev ⭐")
     else:
         bot.send_message(message.chat.id, f"Please enter the translation for the word '{word}':")
         bot.register_next_step_handler(message, get_translation, word)
@@ -114,7 +114,7 @@ def check_delete_word(message):
                          f"The word '{word_to_delete}' has been successfully deleted from the dictionary.")
     else:
         bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
-                                          "Back to menu ⭐ /menu ⭐")
+                                          "Back to dev menu ⭐ /dev ⭐")
 
 
 @bot.message_handler(commands=['top'])
