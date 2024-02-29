@@ -167,8 +167,16 @@ def get_menu(message):
     bot.send_message(message.chat.id,
                      f'Welcome to bot menu 🇬🇧\n\n'
                      '🚀 Start is here 👉 /play 👈\n'
-                     '🥇 Check the score 👉 /top 👈\n'
-                     '📌 Add new word 👉 /add 👈\n')  # 'To check all words press /words 🔡'
+                     '🥇 Check the score 👉 /top 👈\n')
+
+
+@bot.message_handler(commands=['dev'])
+def get_menu(message):
+    bot.send_message(message.chat.id,
+                     f'Welcome to dev menu 🛠\n\n'
+                     '📌 Add new word 👉 /add 👈\n'
+                     '♻ Delete the word 👉 /delete 👈\n'
+                     '📋 Last 50 words 👉 /words 👈\n')  # 'To check all words press /words 🔡'
 
 
 @bot.message_handler(commands=['start'])
