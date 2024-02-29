@@ -90,7 +90,7 @@ def get_translation(message, word):
     dictionary[word] = translation
     bot.send_message(message.chat.id,
                      f'The word "{word}" with translation "{translation}" has been added successfully!\n'
-                     f'Back to menu ⭐ /menu ⭐')
+                     f'Back to dev menu ⭐ /dev ⭐')
 
     with open(DICTIONARY, "w", encoding="utf-8") as file:
         json.dump(dictionary, file, ensure_ascii=False, indent=4)
@@ -111,7 +111,8 @@ def check_delete_word(message):
         with open(DICTIONARY, "w", encoding="utf-8") as file:
             json.dump(dictionary, file, ensure_ascii=False, indent=4)
         bot.send_message(message.chat.id,
-                         f"The word '{word_to_delete}' has been successfully deleted from the dictionary.")
+                         f"The word '{word_to_delete}' has been successfully deleted from the dictionary. "
+                         f"Back to dev menu ⭐ /dev ⭐")
     else:
         bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
                                           "Back to dev menu ⭐ /dev ⭐")
