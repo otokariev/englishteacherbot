@@ -75,25 +75,31 @@ def add_word(message):
 
 
 def check_word(message):
-    word = message.text.strip().upper()
-    if word in dictionary:
-        bot.send_message(message.chat.id,
-                         f" ❌ The word '{word}' already exists in the dictionary ❌\n"
-                         "Back to dev menu ⭐ /dev ⭐")
+    if message.content_type == 'text' and not message.text.startswith('/'):
+        word = message.text.strip().upper()
+        if word not in dictionary:
+            bot.send_message(message.chat.id, f"Please enter the translation for the word '{word}':")
+            bot.register_next_step_handler(message, get_translation, word)
+        else:
+            bot.send_message(message.chat.id,
+                             f" ❌ The word '{word}' already exists in the dictionary ❌\n"
+                             "Back to dev menu ⭐ /dev ⭐")
     else:
-        bot.send_message(message.chat.id, f"Please enter the translation for the word '{word}':")
-        bot.register_next_step_handler(message, get_translation, word)
+        bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 
 
 def get_translation(message, word):
-    translation = message.text.strip().upper()
-    dictionary[word] = translation
-    bot.send_message(message.chat.id,
-                     f'The word "{word}" with translation "{translation}" has been added successfully!\n'
-                     f'Back to dev menu ⭐ /dev ⭐')
+    if message.content_type != 'text' or message.text.startswith('/'):
+        bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
+    else:
+        translation = message.text.strip().upper()
+        dictionary[word] = translation
+        bot.send_message(message.chat.id,
+                         f'The word "{word}" with translation "{translation}" has been added successfully!\n'
+                         f'Back to dev menu ⭐ /dev ⭐')
 
-    with open(DICTIONARY, "w", encoding="utf-8") as file:
-        json.dump(dictionary, file, ensure_ascii=False, indent=4)
+        with open(DICTIONARY, "w", encoding="utf-8") as file:
+            json.dump(dictionary, file, ensure_ascii=False, indent=4)
 
 
 @bot.message_handler(commands=['delete'])
@@ -103,19 +109,20 @@ def delete_word(message):
 
 
 def check_delete_word(message):
-    word_to_delete = message.text.strip().upper()
-    if message.content_type == 'text' \
-            and not message.text.startswith('/') \
-            and word_to_delete in dictionary:
-        del dictionary[word_to_delete]
-        with open(DICTIONARY, "w", encoding="utf-8") as file:
-            json.dump(dictionary, file, ensure_ascii=False, indent=4)
-        bot.send_message(message.chat.id,
-                         f"The word '{word_to_delete}' has been successfully deleted from the dictionary. "
-                         f"Back to dev menu ⭐ /dev ⭐")
+    if message.content_type == 'text' and not message.text.startswith('/'):
+        word_to_delete = message.text.strip().upper()
+        if word_to_delete in dictionary:
+            del dictionary[word_to_delete]
+            with open(DICTIONARY, "w", encoding="utf-8") as file:
+                json.dump(dictionary, file, ensure_ascii=False, indent=4)
+            bot.send_message(message.chat.id,
+                             f"The word '{word_to_delete}' has been successfully deleted from the dictionary.\n"
+                             f"Back to dev menu ⭐ /dev ⭐")
+        else:
+            bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
+                                              "Back to dev menu ⭐ /dev ⭐")
     else:
-        bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
-                                          "Back to dev menu ⭐ /dev ⭐")
+        bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 
 
 @bot.message_handler(commands=['top'])
