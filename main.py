@@ -1,5 +1,5 @@
 import telebot
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from config import TOKEN
 import time
 import threading
@@ -45,15 +45,27 @@ async def root():
     return {"message": "Welcome to English Teacher Bot"}
 
 
-# @bot.message_handler(commands=['words'])
-# def view_words(message):
-#     if dictionary:
-#         words_list = "\n".join([f"{word}: {translation}" for word, translation in dictionary.items()])
-#         bot.send_message(message.chat.id,
-#                          f'List of words with translations:\n\n{words_list}\n\nBack to menu /menu 📋")
+@app.get('/view_dictionary')
+async def view_dictionary():
+    try:
+        with open(DICTIONARY, 'r', encoding='utf-8') as file:
+            dictionary_content = json.load(file)
+        return Response(
+            content=json.dumps(dictionary_content, ensure_ascii=False, indent=4),
+            media_type="application/json"
+        )
+    except FileNotFoundError:
+        return Response(content="Dictionary file not found.", status_code=404)
 
-#     else:
-#         bot.send_message(message.chat.id, "The dictionary is empty!")
+
+@bot.message_handler(commands=['words'])
+def view_words(message):
+    if dictionary:
+        words_list = "\n".join([f"{word}: {translation}" for word, translation in list(dictionary.items())[-50:]])
+        bot.send_message(message.chat.id,
+                         f'List of words with translations:\n\n{words_list}\n\nBack to menu ⭐ /menu ⭐')
+    else:
+        bot.send_message(message.chat.id, "The dictionary is empty!")
 
 
 @bot.message_handler(commands=['add'])
