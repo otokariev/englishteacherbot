@@ -220,7 +220,7 @@ def start_game(message):
 
 
 def get_hint1(message, word):
-    if ' ' in word:
+    if ' ' in dictionary[word]:
         translation = dictionary[word].split(' ')
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
@@ -236,7 +236,7 @@ def get_hint1(message, word):
 
 
 def get_hint2(message, word):
-    if ' ' in word:
+    if ' ' in dictionary[word]:
         translation = dictionary[word].split(' ')
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
@@ -257,7 +257,7 @@ def get_hint2(message, word):
 
 
 def get_hint3(message, word):
-    if ' ' in word:
+    if ' ' in dictionary[word]:
         translation = dictionary[word].split(' ')
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
