@@ -31,7 +31,7 @@ timeout: threading.Timer | None
 
 game = False
 
-DICTIONARY = 'dictionaries/custom_dictionary.json'
+DICTIONARY = 'dictionaries/hard.json'
 
 try:
     with open(DICTIONARY, 'r') as f:
@@ -45,7 +45,7 @@ async def root():
     return {"message": "Welcome to English Teacher Bot"}
 
 
-@app.get('/custom_dictionary')
+@app.get('/hard')
 async def view_dictionary():
     try:
         with open(DICTIONARY, 'r', encoding='utf-8') as file:
@@ -220,24 +220,65 @@ def start_game(message):
 
 
 def get_hint1(message, word):
-    translation = dictionary[word]
-    starred = '*' * len(translation)
-    hint = translation[0] + starred[1:]
-    bot.send_message(message.chat.id, hint)
+    if ' ' in word:
+        translation = dictionary[word].split(' ')
+        len_list = [len(item) for item in translation]
+        starred_list = ['*' * item for item in len_list]
+        hint = (translation[0][:1] + starred_list[0][1:], *starred_list[1:])
+        hint_str = ' '.join(map(str, hint))
+        bot.send_message(message.chat.id, hint_str)
+    else:
+        translation = dictionary[word]
+        len_list = len(translation)
+        starred_list = '*' * len_list
+        hint = translation[:1] + starred_list[1:]
+        bot.send_message(message.chat.id, hint)
 
 
 def get_hint2(message, word):
-    translation = dictionary[word]
-    starred = '*' * len(translation)
-    hint = translation[:2] + starred[2:]
-    bot.send_message(message.chat.id, hint)
+    if ' ' in word:
+        translation = dictionary[word].split(' ')
+        len_list = [len(item) for item in translation]
+        starred_list = ['*' * item for item in len_list]
+        if len_list[0] == 1:
+            hint = translation[0], translation[1][:1] + starred_list[1][1:], *starred_list[2:]
+            hint_str = ' '.join(map(str, hint))
+            bot.send_message(message.chat.id, hint_str)
+        else:
+            hint = translation[0][:2] + starred_list[0][2:], *starred_list[1:]
+            hint_str = ' '.join(map(str, hint))
+            bot.send_message(message.chat.id, hint_str)
+    else:
+        translation = dictionary[word]
+        len_list = len(translation)
+        starred_list = '*' * len_list
+        hint = translation[:2] + starred_list[2:]
+        bot.send_message(message.chat.id, hint)
 
 
 def get_hint3(message, word):
-    translation = dictionary[word]
-    starred = '*' * len(translation)
-    hint = translation[:3] + starred[3:]
-    bot.send_message(message.chat.id, hint)
+    if ' ' in word:
+        translation = dictionary[word].split(' ')
+        len_list = [len(item) for item in translation]
+        starred_list = ['*' * item for item in len_list]
+        if len_list[0] == 1:
+            hint = translation[0], translation[1][:2] + starred_list[1][2:], *starred_list[2:]
+            hint_str = ' '.join(map(str, hint))
+            bot.send_message(message.chat.id, hint_str)
+        elif len_list[0] == 2:
+            hint = translation[0], translation[1][:1] + starred_list[1][1:], *starred_list[2:]
+            hint_str = ' '.join(map(str, hint))
+            bot.send_message(message.chat.id, hint_str)
+        else:
+            hint = translation[0][:3] + starred_list[0][3:], *starred_list[1:]
+            hint_str = ' '.join(map(str, hint))
+            bot.send_message(message.chat.id, hint_str)
+    else:
+        translation = dictionary[word]
+        len_list = len(translation)
+        starred_list = '*' * len_list
+        hint = translation[:3] + starred_list[3:]
+        bot.send_message(message.chat.id, hint)
 
 
 def run_timeout(message, word):
