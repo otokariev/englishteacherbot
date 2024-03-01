@@ -206,10 +206,10 @@ def start_game(message):
         word = random.choice(list(dictionary.keys()))
         bot.send_message(message.chat.id, f"Ok! 😎\nTranslate this word, please:\n✨ {word} ✨")
 
-        hint1 = threading.Timer(10.0, get_hint1, args=[message, word])
-        hint2 = threading.Timer(20.0, get_hint2, args=[message, word])
-        hint3 = threading.Timer(30.0, get_hint3, args=[message, word])
-        timeout = threading.Timer(40.0, run_timeout, args=[message, word])
+        hint1 = threading.Timer(2.0, get_hint1, args=[message, word])
+        hint2 = threading.Timer(4.0, get_hint2, args=[message, word])
+        hint3 = threading.Timer(6.0, get_hint3, args=[message, word])
+        timeout = threading.Timer(8.0, run_timeout, args=[message, word])
 
         hint1.start()
         hint2.start()
