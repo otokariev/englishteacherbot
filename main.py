@@ -125,6 +125,11 @@ def check_delete_word(message):
         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 
 
+@bot.message_handler(commands=['group_id'])
+def get_group_id(message):
+    bot.send_message(message.from_user.id, f'{message.chat.title}\n{message.chat.id}')
+
+
 @bot.message_handler(commands=['top'])
 def get_score(message):
     score_file = get_score_filename(message)
@@ -184,7 +189,7 @@ def get_menu(message):
                      f'Welcome to dev menu 🛠\n\n'
                      '📌 Add new word 👉 /add 👈\n'
                      '♻ Delete the word 👉 /delete 👈\n'
-                     '📋 Last 50 words 👉 /words 👈\n')  # 'To check all words press /words 🔡'
+                     '📋 Last 50 words 👉 /words 👈\n')
 
 
 @bot.message_handler(commands=['start'])
@@ -311,8 +316,9 @@ def check_translation(message, word):
         if message.content_type == 'text' \
                 and not message.text.startswith('/') \
                 and translation.text.strip().lower() == dictionary[word].lower():
-
-            bot.send_message(message.chat.id, "🎯 Exactly! 🎯")
+            user = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
+            bot.send_message(message.chat.id, f'🎯 Good job, {user}! 🎯/\n'
+                                              f'🔥 The answer is: "{dictionary[word]}" 🔥')
 
             update_user_score(message)
 
