@@ -482,3 +482,5 @@ def send_words():
         bot.send_message(361816009, 'Failed to get JSON data.')
 
     threading.Timer(600, send_words).start()
+
+send_words()
