@@ -158,10 +158,13 @@ def get_score(message):
     if scores:
         sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         score_list = ''
-        for user_id, score in sorted_scores:
+
+        for user_id_name, score in sorted_scores:
+            user_id = user_id_name.split('_')[0]
             user = bot.get_chat_member(message.chat.id, user_id).user
-            username = user.username if user.username else f"{user.first_name} {user.last_name}"
+            username = f"{user.first_name} {user.last_name}"
             score_list += f"{username}: {score}\n"
+
         bot.send_message(message.chat.id, '⚡ Top Scores ⚡\n\n' + score_list + f'\nBack to menu ⭐ /menu ⭐')
     else:
         bot.send_message(message.chat.id, "No scores yet!")
@@ -420,9 +423,11 @@ def send_words():
     threading.Timer(900, send_words).start()
 
 
-def run_bot():
-    bot.polling(none_stop=True)
+send_words()
 
-
-if __name__ == "__main__":
-    send_words()
+# def run_bot():
+#     bot.polling(none_stop=True)
+#
+#
+# if __name__ == "__main__":
+#     send_words()
