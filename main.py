@@ -32,7 +32,8 @@ timeout: threading.Timer | None
 game = False
 
 DICTIONARY = 'dictionaries/hard.json'
-GROUP_MEETING = 'groups/chat_-100204691561_scores.json'
+GROUP_MEETING = 'groups/chat_-1002046915616_scores.json'
+
 
 try:
     with open(DICTIONARY, 'r') as f:
