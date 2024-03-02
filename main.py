@@ -224,7 +224,7 @@ def check_user_score(message):
 
 def save_user_points(message, user):
     if message.content_type == 'text' and not message.text.startswith('/'):
-        user_points = message.text
+        user_points = int(message.text)
 
         score_file = get_score_filename(message)
         try:
