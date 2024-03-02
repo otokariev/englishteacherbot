@@ -304,6 +304,7 @@ def hello(message):
 @bot.message_handler(commands=['play'])
 def start_game(message):
     global hint1, hint2, hint3, timeout, game, dictionary
+    bot.send_message(message.chat.id, '⏳ Already looking for a new word ⌛')
 
     game = True
 
