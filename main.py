@@ -1,5 +1,6 @@
 import telebot
 from fastapi import FastAPI, Request, Response
+from deep_translator import GoogleTranslator
 from config import TOKEN
 import time
 import threading
@@ -39,11 +40,36 @@ win_phrases = ['Good job', 'Well done', 'Congrats', 'Hooray', 'Cheers', 'Bravo']
 play_phrases = ['Ok!', 'No problem!', 'Great!', "Let's do it!"]
 play_again_phrases = ['Another word?', 'PLay again?', 'More?', 'Play more?', 'Another round?']
 
-try:
-    with open(DICTIONARY, 'r') as f:
-        dictionary = json.load(f)
-except FileNotFoundError:
-    dictionary = {}
+# try:
+#     with open(DICTIONARY, 'r') as f:
+#         dictionary = json.load(f)
+# except FileNotFoundError:
+#     dictionary = {}
+
+
+def get_word(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            json_data = json.loads(response.text)
+            str_data = json_data[0]
+            if str_data:
+                return str_data
+            else:
+                print("Word not found in JSON data")
+                return None
+        else:
+            print(f"Failed to fetch data. Status code: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
+
+
+word_url = 'https://random-word-api.herokuapp.com/word'
+english = get_word(word_url)
+russian = GoogleTranslator(source='auto', target='ru').translate(english)
+dictionary = {russian.upper(): english.upper()}
 
 
 @app.get('/')
@@ -286,7 +312,10 @@ def start_game(message):
 
     if game:
         time.sleep(1)
-        word = random.choice(list(dictionary.keys()))
+        # word = random.choice(list(dictionary.keys()))
+
+        word = list(dictionary.keys())[0]
+
         play = random.choice(play_phrases)
         bot.send_message(message.chat.id, f"{play} 😎\nTranslate this word, please:\n✨ {word} ✨")
 
@@ -439,8 +468,8 @@ def get_json_data(url):
 
 
 def send_words():
-    url = "https://englishteacherbot.onrender.com/meeting"
-    text_data = get_json_data(url)
+    score_url = "https://englishteacherbot.onrender.com/meeting"
+    text_data = get_json_data(score_url)
 
     if text_data:
         bot.send_message(361816009, f'JSON data received successfully:\n{text_data}')
@@ -448,6 +477,3 @@ def send_words():
         bot.send_message(361816009, 'Failed to get JSON data.')
 
     threading.Timer(600, send_words).start()
-
-
-send_words()
