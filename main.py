@@ -35,6 +35,10 @@ game = False
 DICTIONARY = 'dictionaries/hard.json'
 GROUP_MEETING = 'groups/chat_-1002046915616_scores.json'
 
+win_phrases = ['Good job', 'Well done', 'Congrats', 'Hooray', 'Cheers', 'Bravo']
+play_phrases = ['Ok!', 'No problem!', 'Great!', "Let's do it!"]
+play_again_phrases = ['Another word?', 'PLay again?', 'More?', 'Play more?', 'Another round?']
+
 try:
     with open(DICTIONARY, 'r') as f:
         dictionary = json.load(f)
@@ -271,7 +275,7 @@ def hello(message):
     bot.send_message(message.chat.id,
                      'Hello! 😎\nI am a English teacher bot 🇬🇧\n'
                      'If you want to learn some new words,\njust press /play and try me 😉\n'
-                     'Back to menu ⭐ /menu ⭐')
+                     'Bot menu: ⭐ /menu ⭐')
 
 
 @bot.message_handler(commands=['play'])
@@ -283,7 +287,8 @@ def start_game(message):
     if game:
         time.sleep(1)
         word = random.choice(list(dictionary.keys()))
-        bot.send_message(message.chat.id, f"Ok! 😎\nTranslate this word, please:\n✨ {word} ✨")
+        play = random.choice(play_phrases)
+        bot.send_message(message.chat.id, f"{play} 😎\nTranslate this word, please:\n✨ {word} ✨")
 
         hint1 = threading.Timer(10.0, get_hint1, args=[message, word])
         hint2 = threading.Timer(20.0, get_hint2, args=[message, word])
@@ -370,8 +375,9 @@ def run_timeout(message, word):
     bot.send_message(message.chat.id, f"The correct translation is:\n✨ {dictionary[word]} ✨")
     game = False
     time.sleep(1)
+    play_again = random.choice(play_again_phrases)
     bot.send_message(message.chat.id,
-                     "😎 Another word?\n"
+                     f"😎 {play_again}\n"
                      "✅ Enter 'y'\n")
     bot.register_next_step_handler(message, continue_game)
 
@@ -398,7 +404,8 @@ def check_translation(message, word):
             first_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
             last_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.last_name
             player = f'{first_name} {last_name}'
-            bot.send_message(message.chat.id, f'🎯 Good job, {player}! 🎯/\n'
+            win = random.choice(win_phrases)
+            bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯/\n'
                                               f'🔥 Answer: "{dictionary[word]}" 🔥')
 
             update_user_score(message)
@@ -410,8 +417,9 @@ def check_translation(message, word):
 
             game = False
             time.sleep(3)
+            play_again = random.choice(play_again_phrases)
             bot.send_message(message.chat.id,
-                             "😎 Another word?\n"
+                             f"😎 {play_again}\n"
                              "✅ Enter 'y'\n")
             bot.register_next_step_handler(message, continue_game)
 
@@ -431,8 +439,6 @@ def get_json_data(url):
 
 
 def send_words():
-    bot.send_message(361816009, '200 ok')
-
     url = "https://englishteacherbot.onrender.com/meeting"
     text_data = get_json_data(url)
 
