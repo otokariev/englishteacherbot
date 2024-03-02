@@ -420,7 +420,6 @@ def continue_game(message):
     if message.content_type == 'text' \
             and not message.text.startswith('/') \
             and message.text.lower() == 'y':
-        bot.send_message(message.chat.id, '⏳ Already looking for a new word ⌛')
         start_game(message)
     else:
         bot.send_message(message.chat.id,
