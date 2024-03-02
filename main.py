@@ -32,6 +32,7 @@ timeout: threading.Timer | None
 game = False
 
 DICTIONARY = 'dictionaries/hard.json'
+GROUP_MEETING = 'groups/chat_-100204691561_scores.json'
 
 try:
     with open(DICTIONARY, 'r') as f:
@@ -54,6 +55,21 @@ async def view_dictionary():
             content=json.dumps(dictionary_content, ensure_ascii=False, indent=4),
             media_type="application/json"
         )
+
+    except FileNotFoundError:
+        return Response(content="Dictionary file not found.", status_code=404)
+
+
+@app.get('/meeting')
+async def view_dictionary():
+    try:
+        with open(GROUP_MEETING, 'r', encoding='utf-8') as file:
+            user_content = json.load(file)
+        return Response(
+            content=json.dumps(user_content, ensure_ascii=False, indent=4),
+            media_type='application/json'
+        )
+
     except FileNotFoundError:
         return Response(content="Dictionary file not found.", status_code=404)
 
@@ -169,10 +185,62 @@ def update_user_score(message):
     except FileNotFoundError:
         scores = {}
 
-    scores[str(message.from_user.id)] = scores.get(str(message.from_user.id), 0) + 1
+    user_id = message.from_user.id
+    username = bot.get_chat_member(message.chat.id, message.from_user.id).user.username
+    user = f'{user_id}_{username}'
+    scores[user] = scores.get(user, 0) + 1
 
     with open(score_file, "w", encoding="utf-8") as file:
         json.dump(scores, file, ensure_ascii=False, indent=4)
+
+
+@bot.message_handler(commands=['edit_user'])
+def edit_user_score(message):
+    bot.send_message(message.chat.id, "Please enter the username:")
+    bot.register_next_step_handler(message, check_user_score)
+
+
+def check_user_score(message):
+    if message.content_type == 'text' and not message.text.startswith('/'):
+        user = message.text
+
+        score_file = get_score_filename(message)
+        try:
+            with open(score_file, 'r') as file:
+                scores = json.load(file)
+        except FileNotFoundError:
+            scores = {}
+
+        if user in scores:
+            bot.send_message(message.chat.id, "Please enter the number of points:")
+            bot.register_next_step_handler(message, save_user_points, user)
+
+        else:
+            bot.send_message(message.chat.id, f" ❌ The user '{user}' doesn't exist!❌")
+    else:
+        bot.send_message(message.chat.id, 'Enter text only!')
+
+
+def save_user_points(message, user):
+    if message.content_type == 'text' and not message.text.startswith('/'):
+        user_points = message.text
+
+        score_file = get_score_filename(message)
+        try:
+            with open(score_file, 'r') as file:
+                scores = json.load(file)
+        except FileNotFoundError:
+            scores = {}
+
+        scores[user] = user_points
+
+        with open(score_file, "w", encoding="utf-8") as file:
+            json.dump(scores, file, ensure_ascii=False, indent=4)
+
+        bot.send_message(message.chat.id, f" The score of user '{user}' has been successfully changed.")
+
+    else:
+        bot.send_message(message.chat.id, 'Enter text only!')
 
 
 @bot.message_handler(commands=['menu'])
@@ -211,10 +279,15 @@ def start_game(message):
         word = random.choice(list(dictionary.keys()))
         bot.send_message(message.chat.id, f"Ok! 😎\nTranslate this word, please:\n✨ {word} ✨")
 
-        hint1 = threading.Timer(10.0, get_hint1, args=[message, word])
-        hint2 = threading.Timer(20.0, get_hint2, args=[message, word])
-        hint3 = threading.Timer(30.0, get_hint3, args=[message, word])
-        timeout = threading.Timer(40.0, run_timeout, args=[message, word])
+        # hint1 = threading.Timer(10.0, get_hint1, args=[message, word])
+        # hint2 = threading.Timer(20.0, get_hint2, args=[message, word])
+        # hint3 = threading.Timer(30.0, get_hint3, args=[message, word])
+        # timeout = threading.Timer(40.0, run_timeout, args=[message, word])
+
+        hint1 = threading.Timer(2.0, get_hint1, args=[message, word])
+        hint2 = threading.Timer(4.0, get_hint2, args=[message, word])
+        hint3 = threading.Timer(6.0, get_hint3, args=[message, word])
+        timeout = threading.Timer(8.0, run_timeout, args=[message, word])
 
         hint1.start()
         hint2.start()
@@ -316,9 +389,11 @@ def check_translation(message, word):
         if message.content_type == 'text' \
                 and not message.text.startswith('/') \
                 and translation.text.strip().lower() == dictionary[word].lower():
-            user = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
-            bot.send_message(message.chat.id, f'🎯 Good job, {user}! 🎯/\n'
-                                              f'🔥 The answer is: "{dictionary[word]}" 🔥')
+            first_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
+            last_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.last_name
+            player = f'{first_name} {last_name}'
+            bot.send_message(message.chat.id, f'🎯 Good job, {player}! 🎯/\n'
+                                              f'🔥 Answer: "{dictionary[word]}" 🔥')
 
             update_user_score(message)
 
