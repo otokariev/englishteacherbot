@@ -67,9 +67,6 @@ def get_word(url):
 
 
 word_url = 'https://random-word-api.herokuapp.com/word'
-english = get_word(word_url)
-russian = GoogleTranslator(source='auto', target='ru').translate(english)
-dictionary = {russian.upper(): english.upper()}
 
 
 @app.get('/')
@@ -306,7 +303,7 @@ def hello(message):
 
 @bot.message_handler(commands=['play'])
 def start_game(message):
-    global hint1, hint2, hint3, timeout, game
+    global hint1, hint2, hint3, timeout, game, dictionary
 
     game = True
 
@@ -314,7 +311,14 @@ def start_game(message):
         time.sleep(1)
         # word = random.choice(list(dictionary.keys()))
 
+        ######################################################################
+
+        english = get_word(word_url)
+        russian = GoogleTranslator(source='auto', target='ru').translate(english)
+        dictionary = {russian.upper(): english.upper()}
         word = list(dictionary.keys())[0]
+
+        ######################################################################
 
         play = random.choice(play_phrases)
         bot.send_message(message.chat.id, f"{play} 😎\nTranslate this word, please:\n✨ {word} ✨")
@@ -415,6 +419,7 @@ def continue_game(message):
     if message.content_type == 'text' \
             and not message.text.startswith('/') \
             and message.text.lower() == 'y':
+        bot.send_message(message.chat.id, '⏳ Already looking for a new word ⌛')
         start_game(message)
     else:
         bot.send_message(message.chat.id,
