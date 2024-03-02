@@ -415,5 +415,14 @@ def check_translation(message, word):
             bot.register_next_step_handler(message, check_translation, word)
 
 
-if __name__ == "__main__":
+def send_words():
+    bot.send_message(361816009, '200 ok')
+    threading.Timer(900, send_words).start()
+
+
+def run_bot():
     bot.polling(none_stop=True)
+
+
+if __name__ == "__main__":
+    send_words()
