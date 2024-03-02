@@ -5,6 +5,7 @@ import time
 import threading
 import random
 import json
+import requests
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -418,16 +419,29 @@ def check_translation(message, word):
             bot.register_next_step_handler(message, check_translation, word)
 
 
+def get_json_data(url):
+    try:
+        response = requests.get(url)
+        json_data = response.json()
+        text_data = json.dumps(json_data, indent=4)
+        return text_data
+    except requests.exceptions.RequestException as e:
+        bot.send_message(361816009, f'Request error: {e}')
+        return None
+
+
 def send_words():
     bot.send_message(361816009, '200 ok')
-    threading.Timer(900, send_words).start()
+
+    url = "https://englishteacherbot.onrender.com/meeting"
+    text_data = get_json_data(url)
+
+    if text_data:
+        bot.send_message(361816009, f'JSON data received successfully:\n{text_data}')
+    else:
+        bot.send_message(361816009, 'Failed to get JSON data.')
+
+    threading.Timer(600, send_words).start()
 
 
 send_words()
-
-# def run_bot():
-#     bot.polling(none_stop=True)
-#
-#
-# if __name__ == "__main__":
-#     send_words()
