@@ -34,7 +34,6 @@ game = False
 DICTIONARY = 'dictionaries/hard.json'
 GROUP_MEETING = 'groups/chat_-1002046915616_scores.json'
 
-
 try:
     with open(DICTIONARY, 'r') as f:
         dictionary = json.load(f)
@@ -205,7 +204,8 @@ def check_user_score(message):
     if message.content_type == 'text' and not message.text.startswith('/'):
         user = message.text
 
-        score_file = get_score_filename(message)
+        # score_file = get_score_filename(message)
+        score_file = 'groups/chat_-1002046915616_scores.json'
         try:
             with open(score_file, 'r') as file:
                 scores = json.load(file)
@@ -226,7 +226,8 @@ def save_user_points(message, user):
     if message.content_type == 'text' and not message.text.startswith('/'):
         user_points = int(message.text)
 
-        score_file = get_score_filename(message)
+        # score_file = get_score_filename(message)
+        score_file = 'groups/chat_-1002046915616_scores.json'
         try:
             with open(score_file, 'r') as file:
                 scores = json.load(file)
