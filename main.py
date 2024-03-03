@@ -40,11 +40,11 @@ win_phrases = ['Good job', 'Well done', 'Congrats', 'Hooray', 'Cheers', 'Bravo']
 play_phrases = ['Ok!', 'No problem!', 'Great!', "Let's do it!"]
 play_again_phrases = ['Another word?', 'PLay again?', 'More?', 'Play more?', 'Another round?']
 
-# try:
-#     with open(DICTIONARY, 'r') as f:
-#         dictionary = json.load(f)
-# except FileNotFoundError:
-#     dictionary = {}
+try:
+    with open(DICTIONARY, 'r') as f:
+        dictionary = json.load(f)
+except FileNotFoundError:
+    dictionary = {}
 
 
 def get_word(url):
@@ -89,7 +89,7 @@ async def view_dictionary():
 
 
 @app.get('/meeting')
-async def view_dictionary():
+async def view_score():
     try:
         with open(GROUP_MEETING, 'r', encoding='utf-8') as file:
             user_content = json.load(file)
@@ -99,7 +99,7 @@ async def view_dictionary():
         )
 
     except FileNotFoundError:
-        return Response(content="Dictionary file not found.", status_code=404)
+        return Response(content="Score file not found.", status_code=404)
 
 
 @bot.message_handler(commands=['words'])
@@ -303,7 +303,7 @@ def hello(message):
 
 @bot.message_handler(commands=['play'])
 def start_game(message):
-    global hint1, hint2, hint3, timeout, game, dictionary
+    global hint1, hint2, hint3, timeout, game, dictionary_api  # API
     bot.send_message(message.chat.id, '⏳ Already looking for a new word ⌛')
 
     game = True
@@ -314,10 +314,10 @@ def start_game(message):
 
         ######################################################################
 
-        english = get_word(word_url)
-        russian = GoogleTranslator(source='auto', target='ru').translate(english)
-        dictionary = {russian.upper(): english.upper()}
-        word = list(dictionary.keys())[0]
+        english = get_word(word_url)  # API
+        russian = GoogleTranslator(source='auto', target='ru').translate(english)  # API
+        dictionary_api = {russian.upper(): english.upper()}  # API
+        word = list(dictionary_api.keys())[0]  # API
 
         ######################################################################
 
@@ -329,10 +329,10 @@ def start_game(message):
         hint3 = threading.Timer(30.0, get_hint3, args=[message, word])
         timeout = threading.Timer(40.0, run_timeout, args=[message, word])
 
-        # hint1 = threading.Timer(2.0, get_hint1, args=[message, word])
-        # hint2 = threading.Timer(4.0, get_hint2, args=[message, word])
-        # hint3 = threading.Timer(6.0, get_hint3, args=[message, word])
-        # timeout = threading.Timer(8.0, run_timeout, args=[message, word])
+        # hint1 = threading.Timer(3.0, get_hint1, args=[message, word])
+        # hint2 = threading.Timer(6.0, get_hint2, args=[message, word])
+        # hint3 = threading.Timer(9.0, get_hint3, args=[message, word])
+        # timeout = threading.Timer(12.0, run_timeout, args=[message, word])
 
         hint1.start()
         hint2.start()
@@ -343,15 +343,15 @@ def start_game(message):
 
 
 def get_hint1(message, word):
-    if ' ' in dictionary[word]:
-        translation = dictionary[word].split(' ')
+    if ' ' in dictionary_api[word]:  # API
+        translation = dictionary_api[word].split(' ')  # API
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
         hint = (translation[0][:1] + starred_list[0][1:], *starred_list[1:])
         hint_str = ' '.join(map(str, hint))
         bot.send_message(message.chat.id, hint_str)
     else:
-        translation = dictionary[word]
+        translation = dictionary_api[word]  # API
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:1] + starred_list[1:]
@@ -359,8 +359,8 @@ def get_hint1(message, word):
 
 
 def get_hint2(message, word):
-    if ' ' in dictionary[word]:
-        translation = dictionary[word].split(' ')
+    if ' ' in dictionary_api[word]:  # API
+        translation = dictionary_api[word].split(' ')  # API
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
         if len_list[0] == 1:
@@ -372,7 +372,7 @@ def get_hint2(message, word):
             hint_str = ' '.join(map(str, hint))
             bot.send_message(message.chat.id, hint_str)
     else:
-        translation = dictionary[word]
+        translation = dictionary_api[word]  # API
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:2] + starred_list[2:]
@@ -380,8 +380,8 @@ def get_hint2(message, word):
 
 
 def get_hint3(message, word):
-    if ' ' in dictionary[word]:
-        translation = dictionary[word].split(' ')
+    if ' ' in dictionary_api[word]:  # API
+        translation = dictionary_api[word].split(' ')  # API
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
         if len_list[0] == 1:
@@ -397,7 +397,7 @@ def get_hint3(message, word):
             hint_str = ' '.join(map(str, hint))
             bot.send_message(message.chat.id, hint_str)
     else:
-        translation = dictionary[word]
+        translation = dictionary_api[word]  # API
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:3] + starred_list[3:]
@@ -406,7 +406,7 @@ def get_hint3(message, word):
 
 def run_timeout(message, word):
     global game
-    bot.send_message(message.chat.id, f"The correct translation is:\n✨ {dictionary[word]} ✨")
+    bot.send_message(message.chat.id, f"The correct translation is:\n✨ {dictionary_api[word]} ✨")  # API
     game = False
     time.sleep(1)
     play_again = random.choice(play_again_phrases)
@@ -426,6 +426,8 @@ def continue_game(message):
                          f'See you later 😎\n'
                          'Back to menu ⭐ /menu ⭐')
 
+        update_user_score(message)
+
 
 def check_translation(message, word):
     global hint1, hint2, hint3, timeout, game
@@ -441,17 +443,19 @@ def check_translation(message, word):
             hint3.cancel()
             timeout.cancel()
 
+            update_user_score(message)
+
             start_game(message)
-        
+
         elif message.content_type == 'text' \
                 and not message.text.startswith('/') \
-                and translation.text.strip().lower() == dictionary[word].lower():
+                and translation.text.strip().lower() == dictionary_api[word].lower():  # API
             first_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
             last_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.last_name
             player = f'{first_name} {last_name}'
             win = random.choice(win_phrases)
             bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯/\n'
-                                              f'🔥 Answer: "{dictionary[word]}" 🔥')
+                                              f'🔥 Answer: "{dictionary_api[word]}" 🔥')  # API
 
             update_user_score(message)
 
@@ -479,7 +483,7 @@ def get_json_data(url):
         text_data = json.dumps(json_data, indent=4)
         return text_data
     except requests.exceptions.RequestException as e:
-        bot.send_message(361816009, f'Request error: {e}')
+        bot.send_message(361816009, f'Request error:\n{e}')
         return None
 
 
@@ -492,13 +496,13 @@ def check_score():
     else:
         bot.send_message(361816009, 'Failed to get JSON data.')
 
-    threading.Timer(600, check_score).start()
+    threading.Timer(10, check_score).start()
 
 
-@bot.message_handler(commands=['start_check'])
-def start_check(message):
+@bot.message_handler(commands=['check'])
+def check(message):
     try:
         bot.send_message(message.chat.id, 'Function check_score has been started successfully.')
         check_score()
     except Exception as e:
-        bot.send_message(message.chat.id, f"An error occurred: {str(e)}")
+        bot.send_message(message.chat.id, f"An error occurred:\n{str(e)}")
