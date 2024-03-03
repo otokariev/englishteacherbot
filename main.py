@@ -472,7 +472,7 @@ def get_json_data(url):
         return None
 
 
-def send_words():
+def check_score():
     score_url = "https://englishteacherbot.onrender.com/meeting"
     text_data = get_json_data(score_url)
 
@@ -481,6 +481,13 @@ def send_words():
     else:
         bot.send_message(361816009, 'Failed to get JSON data.')
 
-    threading.Timer(600, send_words).start()
+    threading.Timer(600, check_score).start()
 
-send_words()
+
+@bot.message_handler(commands=['start_check'])
+def start_check(message):
+    try:
+        bot.send_message(message.chat.id, 'Function check_score has been started successfully.')
+        check_score()
+    except Exception as e:
+        bot.send_message(message.chat.id, f"An error occurred: {str(e)}")
