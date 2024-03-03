@@ -432,7 +432,18 @@ def check_translation(message, word):
 
     if game:
         translation = message
+
         if message.content_type == 'text' \
+                and not message.text.startswith('/') \
+                and message.text.lower() == '!skip':
+            hint1.cancel()
+            hint2.cancel()
+            hint3.cancel()
+            timeout.cancel()
+
+            start_game(message)
+        
+        elif message.content_type == 'text' \
                 and not message.text.startswith('/') \
                 and translation.text.strip().lower() == dictionary[word].lower():
             first_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
