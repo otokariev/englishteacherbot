@@ -33,7 +33,8 @@ timeout: threading.Timer | None
 
 game = False
 
-DICTIONARY = 'dictionaries/hard.json'
+BASIC_DICT = 'dictionaries/basic_dict.json'
+ADVANCED_DICT = 'dictionaries/advanced_dict.json'
 GROUP_MEETING = 'groups/chat_-1002046915616_scores.json'
 
 win_phrases = ['Good job', 'Well done', 'Congrats', 'Hooray', 'Cheers', 'Bravo']
@@ -44,10 +45,16 @@ ADMIN = 361816009
 MODERATOR_LIST = [517905016]
 
 try:
-    with open(DICTIONARY, 'r') as f:
-        dictionary = json.load(f)
+    with open(BASIC_DICT, 'r') as f:
+        basic_dict = json.load(f)
 except FileNotFoundError:
-    dictionary = {}
+    basic_dict = {}
+
+try:
+    with open(ADVANCED_DICT, 'r') as f:
+        advanced_dict = json.load(f)
+except FileNotFoundError:
+    advanced_dict = {}
 
 
 def get_word(url):
@@ -94,7 +101,7 @@ async def view_score():
 @app.get('/hard')
 async def view_dictionary():
     try:
-        with open(DICTIONARY, 'r', encoding='utf-8') as file:
+        with open(ADVANCED_DICT, 'r', encoding='utf-8') as file:
             dictionary_content = json.load(file)
         return Response(
             content=json.dumps(dictionary_content, ensure_ascii=False, indent=4),
@@ -107,69 +114,69 @@ async def view_dictionary():
 
 @bot.message_handler(commands=['words'])
 def view_words(message):
-    if dictionary:
-        words_list = "\n".join([f"{word}: {translation}" for word, translation in list(dictionary.items())[-50:]])
+    if advanced_dict:
+        words_list = "\n".join([f"{word}: {translation}" for word, translation in list(advanced_dict.items())[-50:]])
         bot.send_message(message.chat.id,
                          f'List of words with translations:\n\n{words_list}\n\nBack to dev menu ⭐ /dev ⭐')
     else:
         bot.send_message(message.chat.id, "The dictionary is empty!")
 
 
-@bot.message_handler(commands=['add'])
-def add_word(message):
-    bot.send_message(message.chat.id, "Please enter the word you want to add (RUSSIAN/UKRAINIAN):")
-    bot.register_next_step_handler(message, check_word)
+# @bot.message_handler(commands=['add'])
+# def add_word(message):
+#     bot.send_message(message.chat.id, "Please enter the word you want to add (RUSSIAN/UKRAINIAN):")
+#     bot.register_next_step_handler(message, check_word)
+#
+#
+# def check_word(message):
+#     if message.content_type == 'text' and not message.text.startswith('/'):
+#         word = message.text.strip().upper()
+#         if word not in dictionary:
+#             bot.send_message(message.chat.id, f"Please enter the translation for the word '{word}':")
+#             bot.register_next_step_handler(message, get_translation, word)
+#         else:
+#             bot.send_message(message.chat.id,
+#                              f" ❌ The word '{word}' already exists in the dictionary ❌\n"
+#                              "Back to dev menu ⭐ /dev ⭐")
+#     else:
+#         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
+#
+#
+# def get_translation(message, word):
+#     if message.content_type != 'text' or message.text.startswith('/'):
+#         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
+#     else:
+#         translation = message.text.strip().upper()
+#         dictionary[word] = translation
+#         bot.send_message(message.chat.id,
+#                          f'The word "{word}" with translation "{translation}" has been added successfully!\n'
+#                          f'Back to dev menu ⭐ /dev ⭐')
+#
+#         with open(DICTIONARY, "w", encoding="utf-8") as file:
+#             json.dump(dictionary, file, ensure_ascii=False, indent=4)
 
 
-def check_word(message):
-    if message.content_type == 'text' and not message.text.startswith('/'):
-        word = message.text.strip().upper()
-        if word not in dictionary:
-            bot.send_message(message.chat.id, f"Please enter the translation for the word '{word}':")
-            bot.register_next_step_handler(message, get_translation, word)
-        else:
-            bot.send_message(message.chat.id,
-                             f" ❌ The word '{word}' already exists in the dictionary ❌\n"
-                             "Back to dev menu ⭐ /dev ⭐")
-    else:
-        bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
-
-
-def get_translation(message, word):
-    if message.content_type != 'text' or message.text.startswith('/'):
-        bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
-    else:
-        translation = message.text.strip().upper()
-        dictionary[word] = translation
-        bot.send_message(message.chat.id,
-                         f'The word "{word}" with translation "{translation}" has been added successfully!\n'
-                         f'Back to dev menu ⭐ /dev ⭐')
-
-        with open(DICTIONARY, "w", encoding="utf-8") as file:
-            json.dump(dictionary, file, ensure_ascii=False, indent=4)
-
-
-@bot.message_handler(commands=['delete'])
-def delete_word(message):
-    bot.send_message(message.chat.id, "Please enter the word you want to delete:")
-    bot.register_next_step_handler(message, check_delete_word)
-
-
-def check_delete_word(message):
-    if message.content_type == 'text' and not message.text.startswith('/'):
-        word_to_delete = message.text.strip().upper()
-        if word_to_delete in dictionary:
-            del dictionary[word_to_delete]
-            with open(DICTIONARY, "w", encoding="utf-8") as file:
-                json.dump(dictionary, file, ensure_ascii=False, indent=4)
-            bot.send_message(message.chat.id,
-                             f"The word '{word_to_delete}' has been successfully deleted from the dictionary.\n"
-                             f"Back to dev menu ⭐ /dev ⭐")
-        else:
-            bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
-                                              "Back to dev menu ⭐ /dev ⭐")
-    else:
-        bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
+# @bot.message_handler(commands=['delete'])
+# def delete_word(message):
+#     bot.send_message(message.chat.id, "Please enter the word you want to delete:")
+#     bot.register_next_step_handler(message, check_delete_word)
+#
+#
+# def check_delete_word(message):
+#     if message.content_type == 'text' and not message.text.startswith('/'):
+#         word_to_delete = message.text.strip().upper()
+#         if word_to_delete in dictionary:
+#             del dictionary[word_to_delete]
+#             with open(DICTIONARY, "w", encoding="utf-8") as file:
+#                 json.dump(dictionary, file, ensure_ascii=False, indent=4)
+#             bot.send_message(message.chat.id,
+#                              f"The word '{word_to_delete}' has been successfully deleted from the dictionary.\n"
+#                              f"Back to dev menu ⭐ /dev ⭐")
+#         else:
+#             bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
+#                                               "Back to dev menu ⭐ /dev ⭐")
+#     else:
+#         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 
 
 @bot.message_handler(commands=['group_id'])
@@ -201,19 +208,11 @@ def get_top_dict(message):
 
     sorted_top_dict = dict(sorted(top_list.items(), key=lambda x: x[1], reverse=True))
 
-    # bot.send_message(message.chat.id, f'{sorted_top_dict}\n{type(sorted_top_dict)}')
     return sorted_top_dict, score_file
 
 
 @bot.message_handler(commands=['top'])
 def get_score(message):
-    # score_file = get_score_filename(message)
-    # try:
-    #     with open(score_file, 'r') as file:
-    #         scores = json.load(file)
-    # except FileNotFoundError:
-    #     scores = {}
-
     scores, score_file = get_top_dict(message)
 
     if scores:
@@ -235,13 +234,6 @@ def get_score_filename(message):
 
 @bot.message_handler(commands=['update'])
 def update_user_score(message):
-    # score_file = get_score_filename(message)
-    # try:
-    #     with open(score_file, 'r') as file:
-    #         scores = json.load(file)
-    # except FileNotFoundError:
-    #     scores = {}
-
     scores, score_file = get_top_dict(message)
 
     last_scores = scores.copy()
@@ -270,10 +262,11 @@ def is_champion(message, last_scores, updated_scores):
 
     last_champion_score = last_list.split(':', maxsplit=1)[1]
     new_champion_score = updated_list.split(':', maxsplit=1)[1]
-    # last_champion = last.split(':', maxsplit=1)[0]
+    last_champion = last.split(':', maxsplit=1)[0]
     new_champion = updated.split(':', maxsplit=1)[0]
 
-    if new_champion_score > last_champion_score:
+    if (last_champion != new_champion
+            and new_champion_score > last_champion_score):
         bot.send_message(message.chat.id, f'🎉 Congrats! 🎉\n'
                                           f'The new champion is:\n'
                                           f'💥 {new_champion} 💥')
@@ -332,7 +325,6 @@ def save_user_points(message, user):
 
 @bot.message_handler(commands=['menu'])
 def get_menu(message):
-
     if message.chat.type == "private":
 
         if message.from_user.id == ADMIN:
@@ -340,8 +332,8 @@ def get_menu(message):
                              f'Welcome to admin menu 🇬🇧\n\n'
                              '🚀 Start is here 👉 /play 👈\n'
                              '🥇 Check the score 👉 /top 👈\n'
-                             '📌 Add new word 👉 /add 👈\n'
-                             '♻ Delete the word 👉 /delete 👈\n'
+                             # '📌 Add new word 👉 /add 👈\n'
+                             # '♻ Delete the word 👉 /delete 👈\n'
                              '📋 Last 50 words 👉 /words 👈\n'
                              '✅ Exec check func 👉 /check 👈\n'
                              '🆔 Check chat id 👉 /chat_id 👈\n'
@@ -355,8 +347,8 @@ def get_menu(message):
                              f'Welcome to moderator menu 🇬🇧\n\n'
                              '🚀 Start is here 👉 /play 👈\n'
                              '🥇 Check the score 👉 /top 👈\n'
-                             '📌 Add new word 👉 /add 👈\n'
-                             '♻ Delete the word 👉 /delete 👈\n'
+                             # '📌 Add new word 👉 /add 👈\n'
+                             # '♻ Delete the word 👉 /delete 👈\n'
                              '📋 Last 50 words 👉 /words 👈\n'
                              '⏩ Skip word enter 👉 !skip 👈\n'
                              '📛 Stop the game enter 👉 !stop 👈')
@@ -386,61 +378,71 @@ def hello(message):
 
 
 @bot.message_handler(commands=['play'])
-def start_game(message):
+def choose_dict_level(message):
+    bot.send_message(message.chat.id, '📶 Choose a level:\n\n'
+                                      '⭐ Basic(Enter !basic)\n'
+                                      '💎 Advanced(Enter !advanced)\n'
+                                      '🌶 Insane(Enter !insane)')
+
+    bot.register_next_step_handler(message, get_dict_level)
+
+
+def get_dict_level(message):
+    if message.content_type == 'text' and not message.text.startswith('/'):
+        level = message.text
+        bot.send_message(message.chat.id, f'You have chosen level "{level.upper()[1:]}"')
+        time.sleep(2)
+        prepare_random_word(message, level)
+
+
+def prepare_random_word(message, level):
+    if level == '!basic':
+        russian = random.choice(list(basic_dict.keys()))
+        english = basic_dict[russian]
+        word = [russian, english]
+        start_game(message, word, level)
+
+    elif level == '!advanced':
+        russian = random.choice(list(advanced_dict.keys()))
+        english = advanced_dict[russian]
+        word = [russian, english]
+        start_game(message, word, level)
+
+    elif level == '!insane':
+        english = get_word(word_url).upper()
+        russian = GoogleTranslator(source='auto', target='ru').translate(english).upper()
+        word = [russian, english]
+        start_game(message, word, level)
+
+
+def start_game(message, word, level):
     global hint1, hint2, hint3, timeout, game
     bot.send_message(message.chat.id, '⏳ Looking for a new word ⌛')
 
     game = True
 
     if game:
-        time.sleep(1)
-        # word = random.choice(list(dictionary.keys()))
-
-        ######################################################################
-
-        english = get_word(word_url).upper()  # API
-        russian = GoogleTranslator(source='auto', target='ru').translate(english).upper()  # API
-
-        ######################################################################
+        time.sleep(2)
 
         play = random.choice(play_phrases)
-        # bot.send_message(message.chat.id, f"{play} 😎\nTranslate this word, please:\n✨ {word} ✨\n"
-        bot.send_message(message.chat.id, f"{play} 😎\nTranslate this word, please:\n✨ {russian} ✨\n"  # API
-                                          f"🔹 {len(english)} letters 🔹")
+        bot.send_message(message.chat.id, f"{play} 😎\nTranslate this word, please:\n✨ {word[0]} ✨\n"
+                                          f"🔹 {len(word[1])} letters 🔹")
 
-        # hint1 = threading.Timer(10.0, get_hint1, args=[message, word])
-        # hint2 = threading.Timer(20.0, get_hint2, args=[message, word])
-        # hint3 = threading.Timer(30.0, get_hint3, args=[message, word])
-        # timeout = threading.Timer(40.0, run_timeout, args=[message, word])
-        #
-        # hint1 = threading.Timer(3.0, get_hint1, args=[message, word])
-        # hint2 = threading.Timer(6.0, get_hint2, args=[message, word])
-        # hint3 = threading.Timer(9.0, get_hint3, args=[message, word])
-        # timeout = threading.Timer(12.0, run_timeout, args=[message, word])
-
-        hint1 = threading.Timer(10.0, get_hint1, args=[message, english])  # API
-        hint2 = threading.Timer(20.0, get_hint2, args=[message, english])  # API
-        hint3 = threading.Timer(30.0, get_hint3, args=[message, english])  # API
-        timeout = threading.Timer(40.0, run_timeout, args=[message, english])  # API
-
-        # hint1 = threading.Timer(3.0, get_hint1, args=[message, english])  # API
-        # hint2 = threading.Timer(6.0, get_hint2, args=[message, english])  # API
-        # hint3 = threading.Timer(9.0, get_hint3, args=[message, english])  # API
-        # timeout = threading.Timer(12.0, run_timeout, args=[message, english])  # API
+        hint1 = threading.Timer(10.0, get_hint1, args=[message, word[1]])
+        hint2 = threading.Timer(20.0, get_hint2, args=[message, word[1]])
+        hint3 = threading.Timer(30.0, get_hint3, args=[message, word[1]])
+        timeout = threading.Timer(40.0, run_timeout, args=[message, word[1], level])
 
         hint1.start()
         hint2.start()
         hint3.start()
         timeout.start()
 
-        # bot.register_next_step_handler(message, check_answer, word)
-        bot.register_next_step_handler(message, check_answer, english)  # API
+        bot.register_next_step_handler(message, check_answer, word[1], level)
 
 
 def get_hint1(message, word):
-    # if ' ' in dictionary[word]:
     if ' ' in word:  # API
-        # translation = dictionary[word].split(' ')
         translation = word  # API
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
@@ -448,8 +450,7 @@ def get_hint1(message, word):
         hint_str = ' '.join(map(str, hint))
         bot.send_message(message.chat.id, hint_str)
     else:
-        # translation = dictionary[word]
-        translation = word  # API
+        translation = word
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:1] + starred_list[1:]
@@ -457,10 +458,8 @@ def get_hint1(message, word):
 
 
 def get_hint2(message, word):
-    # if ' ' in dictionary[word]:
-    if ' ' in word:  # API
-        # translation = dictionary[word].split(' ')
-        translation = word  # API
+    if ' ' in word:
+        translation = word
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
         if len_list[0] == 1:
@@ -472,8 +471,7 @@ def get_hint2(message, word):
             hint_str = ' '.join(map(str, hint))
             bot.send_message(message.chat.id, hint_str)
     else:
-        # translation = dictionary[word]
-        translation = word  # API
+        translation = word
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:2] + starred_list[2:]
@@ -481,10 +479,8 @@ def get_hint2(message, word):
 
 
 def get_hint3(message, word):
-    # if ' ' in dictionary[word]:
-    if ' ' in word:  # API
-        # translation = dictionary[word].split(' ')
-        translation = word  # API
+    if ' ' in word:
+        translation = word
         len_list = [len(item) for item in translation]
         starred_list = ['*' * item for item in len_list]
         if len_list[0] == 1:
@@ -500,39 +496,37 @@ def get_hint3(message, word):
             hint_str = ' '.join(map(str, hint))
             bot.send_message(message.chat.id, hint_str)
     else:
-        # translation = dictionary[word]
-        translation = word  # API
+        translation = word
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:3] + starred_list[3:]
         bot.send_message(message.chat.id, hint)
 
 
-def run_timeout(message, word):
+def run_timeout(message, word, level):
     global game
-    # bot.send_message(message.chat.id, f"The correct translation is:\n✨ {dictionary[word]} ✨")
-    bot.send_message(message.chat.id, f"The correct translation is:\n✨ {word} ✨")  # API
+    bot.send_message(message.chat.id, f"The correct translation is:\n✨ {word} ✨")
     game = False
     time.sleep(1)
     play_again = random.choice(play_again_phrases)
     bot.send_message(message.chat.id,
                      f"😎 {play_again}\n"
                      "✅ Enter 'y'\n")
-    bot.register_next_step_handler(message, continue_game)
+    bot.register_next_step_handler(message, continue_game, level)
 
 
-def continue_game(message):
+def continue_game(message, level):
     if message.content_type == 'text' \
             and not message.text.startswith('/') \
             and message.text.lower() == 'y':
-        start_game(message)
+        prepare_random_word(message, level)
     else:
         bot.send_message(message.chat.id,
                          f'See you later 😎\n'
                          'Back to menu ⭐ /menu ⭐')
 
 
-def check_answer(message, word):
+def check_answer(message, word, level):
     global hint1, hint2, hint3, timeout, game
 
     if game:
@@ -546,7 +540,7 @@ def check_answer(message, word):
             hint3.cancel()
             timeout.cancel()
 
-            start_game(message)
+            prepare_random_word(message, level)
 
         elif message.content_type == 'text' \
                 and not message.text.startswith('/') \
@@ -564,15 +558,13 @@ def check_answer(message, word):
 
         elif message.content_type == 'text' \
                 and not message.text.startswith('/') \
-                and answer.text.strip().lower() == word.lower():  # API
-            # and answer.text.strip().lower() == dictionary[word].lower():
+                and answer.text.strip().lower() == word.lower():
             first_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
             last_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.last_name
             player = f'{first_name} {last_name}'
             win = random.choice(win_phrases)
-            bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯/\n'
-                                              f'The answer is:\n🔥 "{word}" 🔥')  # API
-            # f'🔥 Answer: "{dictionary[word]}" 🔥')
+            bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n'
+                                              f'The answer is:\n🔥 "{word}" 🔥')
             update_user_score(message)
 
             hint1.cancel()
@@ -586,10 +578,10 @@ def check_answer(message, word):
             bot.send_message(message.chat.id,
                              f"😎 {play_again}\n"
                              "✅ Enter 'y'\n")
-            bot.register_next_step_handler(message, continue_game)
+            bot.register_next_step_handler(message, continue_game, level)
 
         else:
-            bot.register_next_step_handler(message, check_answer, word)
+            bot.register_next_step_handler(message, check_answer, word, level)
 
 
 def get_json_data(url):

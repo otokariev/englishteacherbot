@@ -208,5 +208,7 @@
     "ВОЗВРАТ ДЕНЕГ": "REFUND",
     "СМЕНА": "SHIFT",
     "БЫСТРЫЙ": "RAPID",
-    "СПОРНЫЙ": "CONTROVERSIAL"
+    "СПОРНЫЙ": "CONTROVERSIAL",
+    "РЕГУЛИРОВАТЬ": "ADJUST",
+    "ЧАСТОТА": "FREQUENCY"
 }
