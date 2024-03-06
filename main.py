@@ -602,7 +602,7 @@ def check_score():
     # text_data = get_json_data(score_url)
     get_json_data(score_url)
 
-    bot.send_message(ADMIN, ' 200 ok')
+    # bot.send_message(ADMIN, ' 200 ok')
 
     # if text_data:
     #     bot.send_message(ADMIN, f'JSON data received successfully:\n{text_data}')
