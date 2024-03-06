@@ -587,11 +587,11 @@ def check_answer(message, word, level):
 def get_json_data(url):
     try:
         requests.get(url)
-        # response = requests.get(url)
-        # json_data = response.json()
-        # text_data = json.dumps(json_data, indent=4)
-        # return text_data
-        return None
+        response = requests.get(url)
+        json_data = response.json()
+        text_data = json.dumps(json_data, indent=4)
+        return text_data
+
     except requests.exceptions.RequestException as e:
         bot.send_message(ADMIN, f'Request error:\n{e}')
         return None
