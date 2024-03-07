@@ -591,7 +591,7 @@ def get_hint3(message, word):
 def run_timeout(message, word, category, level):
     global game
 
-    if len(word[1]) > 2:
+    if len(word) > 2:
         bot.send_message(message.chat.id, f'The correct translation is:\n✨ {word[1]} ✨\n\n'
                                           f'♾ Synonyms:\n'
                                           f'{word[2]}')
@@ -656,7 +656,7 @@ def check_answer(message, word, category, level):
             player = f'{first_name} {last_name}'
             win = random.choice(win_phrases)
 
-            if len(word[1]) > 2:
+            if len(word) > 2:
                 bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n'
                                                   f'The answer is:\n🔥 "{word[1]}" 🔥\n\n'
                                                   f'♾ Synonyms:\n'
