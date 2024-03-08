@@ -33,8 +33,8 @@ timeout: threading.Timer | None
 
 game = False
 
-BASIC_DICT = 'dictionaries/basic_dict.json'
-ADVANCED_DICT = 'dictionaries/advanced_dict.json'
+BASIC_DICT = 'dictionary/basic_dict.json'
+ADVANCED_DICT = 'dictionary/advanced_dict.json'
 GROUP_MEETING = 'group/chat_-1002046915616_scores.json'
 
 win_phrases = ['Good job', 'Well done', 'Congrats', 'Hooray', 'Cheers', 'Bravo']
@@ -124,7 +124,7 @@ def view_words(message):
 
 # @bot.message_handler(commands=['add'])
 # def add_word(message):
-#     bot.send_message(message.group.id, "Please enter the word you want to add (RUSSIAN/UKRAINIAN):")
+#     bot.send_message(message.chat.id, "Please enter the word you want to add (RUSSIAN/UKRAINIAN):")
 #     bot.register_next_step_handler(message, check_word)
 #
 #
@@ -132,23 +132,23 @@ def view_words(message):
 #     if message.content_type == 'text' and not message.text.startswith('/'):
 #         word = message.text.strip().upper()
 #         if word not in dictionary:
-#             bot.send_message(message.group.id, f"Please enter the translation for the word '{word}':")
+#             bot.send_message(message.chat.id, f"Please enter the translation for the word '{word}':")
 #             bot.register_next_step_handler(message, get_translation, word)
 #         else:
-#             bot.send_message(message.group.id,
+#             bot.send_message(message.chat.id,
 #                              f" ❌ The word '{word}' already exists in the dictionary ❌\n"
 #                              "Back to dev menu ⭐ /dev ⭐")
 #     else:
-#         bot.send_message(message.group.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
+#         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 #
 #
 # def get_translation(message, word):
 #     if message.content_type != 'text' or message.text.startswith('/'):
-#         bot.send_message(message.group.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
+#         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 #     else:
 #         translation = message.text.strip().upper()
 #         dictionary[word] = translation
-#         bot.send_message(message.group.id,
+#         bot.send_message(message.chat.id,
 #                          f'The word "{word}" with translation "{translation}" has been added successfully!\n'
 #                          f'Back to dev menu ⭐ /dev ⭐')
 #
@@ -158,7 +158,7 @@ def view_words(message):
 
 # @bot.message_handler(commands=['delete'])
 # def delete_word(message):
-#     bot.send_message(message.group.id, "Please enter the word you want to delete:")
+#     bot.send_message(message.chat.id, "Please enter the word you want to delete:")
 #     bot.register_next_step_handler(message, check_delete_word)
 #
 #
@@ -169,14 +169,14 @@ def view_words(message):
 #             del dictionary[word_to_delete]
 #             with open(DICTIONARY, "w", encoding="utf-8") as file:
 #                 json.dump(dictionary, file, ensure_ascii=False, indent=4)
-#             bot.send_message(message.group.id,
+#             bot.send_message(message.chat.id,
 #                              f"The word '{word_to_delete}' has been successfully deleted from the dictionary.\n"
 #                              f"Back to dev menu ⭐ /dev ⭐")
 #         else:
-#             bot.send_message(message.group.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
+#             bot.send_message(message.chat.id, f" ❌ The word '{word_to_delete}' doesn't exist in the dictionary ❌\n"
 #                                               "Back to dev menu ⭐ /dev ⭐")
 #     else:
-#         bot.send_message(message.group.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
+#         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 
 
 @bot.message_handler(commands=['group_id'])
@@ -245,7 +245,7 @@ def update_user_score(message):
 
     from_chat = message.chat.id
     updated_scores = scores
-    bot.send_message(ADMIN, f'Updated score from group:\n\n{from_chat}\n\n{updated_scores}')
+    bot.send_message(ADMIN, f'Updated score from chat:\n\n{from_chat}\n\n{updated_scores}')
 
     with open(score_file, "w", encoding="utf-8") as file:
         json.dump(scores, file, ensure_ascii=False, indent=4)
@@ -336,7 +336,7 @@ def get_menu(message):
                              # '♻ Delete the word 👉 /delete 👈\n'
                              '📋 Last 50 words 👉 /words 👈\n'
                              '✅ Exec check func 👉 /check 👈\n'
-                             '🆔 Check group id 👉 /chat_id 👈\n'
+                             '🆔 Check chat id 👉 /chat_id 👈\n'
                              '📊 To edit score 👉 /edit_score 👈\n'
                              '🔝 Inc user score by 1 👉 /update 👈\n'
                              '⏩ Skip word enter 👉 !skip 👈\n'
@@ -380,7 +380,7 @@ def hello(message):
 def get_or_create_private_dict(message):
     user_id = message.from_user.id
     username = bot.get_chat_member(message.chat.id, message.from_user.id).user.username
-    filename = f'dictionaries/user/{user_id}_{username}.json'
+    filename = f'dictionary/user/{user_id}_{username}.json'
 
     try:
         with open(filename, 'r') as file:
