@@ -35,7 +35,7 @@ game = False
 
 BASIC_DICT = 'dictionaries/basic_dict.json'
 ADVANCED_DICT = 'dictionaries/advanced_dict.json'
-GROUP_MEETING = 'chat/chat_-1002046915616_scores.json'
+GROUP_MEETING = 'groups/chat_-1002046915616_scores.json'
 
 win_phrases = ['Good job', 'Well done', 'Congrats', 'Hooray', 'Cheers', 'Bravo']
 play_phrases = ['Ok!', 'No problem!', 'Great!', "Let's do it!"]
@@ -226,9 +226,9 @@ def get_score_filename(message):
     chat_type = message.chat.type
     folder = None
     if chat_type == "private":
-        folder = "user"
+        folder = "users"
     elif chat_type in ["supergroup", "group"]:
-        folder = "chat"
+        folder = "groups"
     return f"{folder}/chat_{message.chat.id}_scores.json"
 
 
@@ -283,7 +283,7 @@ def check_user_score(message):
         user = message.text
 
         # score_file = get_score_filename(message)
-        score_file = 'chat/chat_-1002046915616_scores.json'
+        score_file = 'groups/chat_-1002046915616_scores.json'
         try:
             with open(score_file, 'r') as file:
                 scores = json.load(file)
@@ -305,7 +305,7 @@ def save_user_points(message, user):
         user_points = int(message.text)
 
         # score_file = get_score_filename(message)
-        score_file = 'chat/chat_-1002046915616_scores.json'
+        score_file = 'groups/chat_-1002046915616_scores.json'
         try:
             with open(score_file, 'r') as file:
                 scores = json.load(file)
@@ -396,25 +396,24 @@ def get_or_create_private_dict(message):
 @bot.message_handler(commands=['play'])
 def choose_dict_category(message):
     bot.send_message(message.chat.id, '🗂 Choose a category:\n\n'
-                                      '🌍 Public (Enter !public)\n'
-                                      '🔑 Private(Enter !private)')
+                                      '🌍 Public(/public)\n'
+                                      '🔑 Private(/private)')
 
     bot.register_next_step_handler(message, valid_dict_category)
 
 
 def valid_dict_category(message):
     if (message.content_type == 'text'
-            and not message.text.startswith('/')
-            and message.text in ['!public', '!private']):
+            and message.text in ['/public', '/private']):
         category = message.text
         bot.send_message(message.chat.id, f'✅ You have chosen category:\n'
                                           f'✨ {category.upper()[1:]} ✨')
         time.sleep(2)
 
-        if category == '!public':
+        if category == '/public':
             choose_dict_level(message, category)
 
-        elif category == '!private':
+        elif category == '/private':
             level = None
             get_dict_category_and_level(message, category, level)
     else:
@@ -425,17 +424,16 @@ def valid_dict_category(message):
 
 def choose_dict_level(message, category):
     bot.send_message(message.chat.id, '📶 Choose a level:\n\n'
-                                      '⭐ Basic(Enter !basic)\n'
-                                      '💎 Advanced(Enter !advanced)\n'
-                                      '🌶 Insane(Enter !insane)')
+                                      '⭐ Basic(/basic)\n'
+                                      '💎 Advanced(/advanced)\n'
+                                      '🌶 Insane(/insane)')
 
     bot.register_next_step_handler(message, valid_dict_level, category)
 
 
 def valid_dict_level(message, category):
     if (message.content_type == 'text'
-            and not message.text.startswith('/')
-            and message.text in ['!basic', '!advanced', '!insane']):
+            and message.text in ['/basic', '/advanced', '/insane']):
         level = message.text
         bot.send_message(message.chat.id, f'✅ You have chosen level:\n'
                                           f'✨ {level.upper()[1:]} ✨')
@@ -448,8 +446,8 @@ def valid_dict_level(message, category):
 
 
 def get_dict_category_and_level(message, category, level):
-    if category == '!public':
-        if level == '!basic':
+    if category == '/public':
+        if level == '/basic':
             russian = random.choice(list(basic_dict.keys()))
 
             if len(basic_dict[russian].split(' ')) > 1:
@@ -464,7 +462,7 @@ def get_dict_category_and_level(message, category, level):
                 word = [russian, english]
                 start_game(message, word, category, level)
 
-        elif level == '!advanced':
+        elif level == '/advanced':
             russian = random.choice(list(advanced_dict.keys()))
 
             if len(advanced_dict[russian].split(' ')) > 1:
@@ -479,13 +477,13 @@ def get_dict_category_and_level(message, category, level):
                 word = [russian, english]
                 start_game(message, word, category, level)
 
-        elif level == '!insane':
+        elif level == '/insane':
             english = get_word(word_url).upper()
             russian = GoogleTranslator(source='auto', target='ru').translate(english).upper()
             word = [russian, english]
             start_game(message, word, category, level)
 
-    elif category == '!private':
+    elif category == '/private':
         private_dict = get_or_create_private_dict(message)
 
         try:
@@ -697,7 +695,7 @@ def get_json_data(url):
         return None
 
 
-def check_score():
+def check_server():
     score_url = "https://englishteacherbot.onrender.com/meeting"
     # text_data = get_json_data(score_url)
     get_json_data(score_url)
@@ -709,13 +707,13 @@ def check_score():
     # else:
     #     bot.send_message(ADMIN, 'Failed to get JSON data.')
 
-    threading.Timer(59, check_score).start()
+    threading.Timer(59, check_server).start()
 
 
 @bot.message_handler(commands=['check'])
 def check(message):
     try:
-        bot.send_message(message.chat.id, 'Function check_score has been started successfully.')
-        check_score()
+        bot.send_message(message.chat.id, 'Function check_server has been started successfully.')
+        check_server()
     except Exception as e:
         bot.send_message(message.chat.id, f"An error occurred:\n{str(e)}")
