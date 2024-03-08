@@ -338,9 +338,7 @@ def get_menu(message):
                              '✅ Exec check func 👉 /check 👈\n'
                              '🆔 Check chat id 👉 /chat_id 👈\n'
                              '📊 To edit score 👉 /edit_score 👈\n'
-                             '🔝 Inc user score by 1 👉 /update 👈\n'
-                             '⏩ Skip word enter 👉 !skip 👈\n'
-                             '📛 Stop the game enter 👉 !stop 👈')
+                             '🔝 Inc user score by 1 👉 /update 👈\n')
 
         elif message.from_user.id in MODERATOR_LIST:
             bot.send_message(message.chat.id,
@@ -349,24 +347,18 @@ def get_menu(message):
                              '🥇 Check the score 👉 /top 👈\n'
                              # '📌 Add new word 👉 /add 👈\n'
                              # '♻ Delete the word 👉 /delete 👈\n'
-                             '📋 Last 50 words 👉 /words 👈\n'
-                             '⏩ Skip word enter 👉 !skip 👈\n'
-                             '📛 Stop the game enter 👉 !stop 👈')
+                             '📋 Last 50 words 👉 /words 👈\n')
 
         else:
             bot.send_message(message.chat.id,
                              'Welcome to bot menu 🇬🇧\n\n'
-                             '🚀 Start is here 👉 /play 👈\n'
-                             '⏩ Skip word enter 👉 !skip 👈\n'
-                             '📛 Stop the game enter 👉 !stop 👈')
+                             '🚀 Start is here 👉 /play 👈\n')
 
     else:
         bot.send_message(message.chat.id,
                          f'Welcome to bot menu 🇬🇧\n\n'
                          '🚀 Start is here 👉 /play 👈\n'
-                         '🥇 Check the score 👉 /top 👈\n'
-                         '⏩ Skip word enter 👉 !skip 👈\n'
-                         '📛 Stop the game enter 👉 !stop 👈')
+                         '🥇 Check the score 👉 /top 👈\n')
 
 
 @bot.message_handler(commands=['start'])
@@ -418,8 +410,8 @@ def valid_dict_category(message):
             get_dict_category_and_level(message, category, level)
     else:
         bot.send_message(message.chat.id, '⛔ Wrong command.\n'
-                                          '🔁 Please, try again.\n'
-                                          '↩ Back to menu ⭐ /menu ⭐')
+                                          'Please, try again.\n\n'
+                                          'Back to menu ⭐ /menu ⭐')
 
 
 def choose_dict_level(message, category):
@@ -441,8 +433,8 @@ def valid_dict_level(message, category):
         get_dict_category_and_level(message, category, level)
     else:
         bot.send_message(message.chat.id, '⛔ Wrong command.\n'
-                                          '🔁 Please, try again.\n'
-                                          '↩ Back to menu ⭐ /menu ⭐')
+                                          'Please, try again.\n\n'
+                                          'Back to menu ⭐ /menu ⭐')
 
 
 def get_dict_category_and_level(message, category, level):
@@ -508,8 +500,10 @@ def start_game(message, word, category, level):
         time.sleep(2)
 
         play = random.choice(play_phrases)
-        bot.send_message(message.chat.id, f"{play} 😎\nTranslate this word, please:\n✨ {word[0]} ✨\n"
-                                          f"🔹 {len(word[1])} letters 🔹")
+        bot.send_message(message.chat.id, f"{play} 😎\nTranslate the word, please:\n\n✨ {word[0]} ✨\n"
+                                          f"🔹 {len(word[1])} letters 🔹\n\n"
+                                          f"Skip the word /skip\n"
+                                          f"Stop the game /stop")
 
         hint1 = threading.Timer(10.0, get_hint1, args=[message, word])
         hint2 = threading.Timer(20.0, get_hint2, args=[message, word])
@@ -531,13 +525,15 @@ def get_hint1(message, word):
         starred_list = ['*' * item for item in len_list]
         hint = (translation[0][:1] + starred_list[0][1:], *starred_list[1:])
         hint_str = ' '.join(map(str, hint))
-        bot.send_message(message.chat.id, hint_str)
+        bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
+                                          f"/skip  /stop")
     else:
         translation = word[1]
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:1] + starred_list[1:]
-        bot.send_message(message.chat.id, hint)
+        bot.send_message(message.chat.id, f"✨ {hint} ✨\n\n"
+                                          f"/skip  /stop")
 
 
 def get_hint2(message, word):
@@ -548,17 +544,20 @@ def get_hint2(message, word):
         if len_list[0] == 1:
             hint = translation[0], translation[1][:1] + starred_list[1][1:], *starred_list[2:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, hint_str)
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
+                                              f"/skip  /stop")
         else:
             hint = translation[0][:2] + starred_list[0][2:], *starred_list[1:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, hint_str)
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
+                                              f"/skip  /stop")
     else:
         translation = word[1]
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:2] + starred_list[2:]
-        bot.send_message(message.chat.id, hint)
+        bot.send_message(message.chat.id, f"✨ {hint} ✨\n\n"
+                                          f"/skip  /stop")
 
 
 def get_hint3(message, word):
@@ -569,21 +568,25 @@ def get_hint3(message, word):
         if len_list[0] == 1:
             hint = translation[0], translation[1][:2] + starred_list[1][2:], *starred_list[2:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, hint_str)
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
+                                              f"/skip  /stop")
         elif len_list[0] == 2:
             hint = translation[0], translation[1][:1] + starred_list[1][1:], *starred_list[2:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, hint_str)
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
+                                              f"/skip  /stop")
         else:
             hint = translation[0][:3] + starred_list[0][3:], *starred_list[1:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, hint_str)
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
+                                              f"/skip  /stop")
     else:
         translation = word[1]
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:3] + starred_list[3:]
-        bot.send_message(message.chat.id, hint)
+        bot.send_message(message.chat.id, f"✨ {hint} ✨\n\n"
+                                          f"/skip  /stop")
 
 
 def run_timeout(message, word, category, level):
@@ -600,15 +603,14 @@ def run_timeout(message, word, category, level):
     time.sleep(1)
     play_again = random.choice(play_again_phrases)
     bot.send_message(message.chat.id,
-                     f"😎 {play_again}\n"
-                     "✅ Enter 'y'\n")
+                     f"😎 {play_again}\n\n"
+                     "✅ Press /yes\n")
     bot.register_next_step_handler(message, continue_game, category, level)
 
 
 def continue_game(message, category, level):
     if message.content_type == 'text' \
-            and not message.text.startswith('/') \
-            and message.text.lower() == 'y':
+            and message.text.lower() == '/yes':
         get_dict_category_and_level(message, category, level)
     else:
         bot.send_message(message.chat.id,
@@ -623,8 +625,7 @@ def check_answer(message, word, category, level):
         answer = message
 
         if message.content_type == 'text' \
-                and not message.text.startswith('/') \
-                and message.text.lower() == '!skip':
+                and message.text.lower() == '/skip':
             hint1.cancel()
             hint2.cancel()
             hint3.cancel()
@@ -633,8 +634,7 @@ def check_answer(message, word, category, level):
             get_dict_category_and_level(message, category, level)
 
         elif message.content_type == 'text' \
-                and not message.text.startswith('/') \
-                and message.text.lower() == '!stop':
+                and message.text.lower() == '/stop':
             hint1.cancel()
             hint2.cancel()
             hint3.cancel()
@@ -655,12 +655,12 @@ def check_answer(message, word, category, level):
             win = random.choice(win_phrases)
 
             if len(word) > 2:
-                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n'
+                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n\n'
                                                   f'The answer is:\n🔥 "{word[1]}" 🔥\n\n'
                                                   f'♾ Synonyms:\n'
                                                   f'{word[2]}')
             else:
-                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n'
+                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n\n'
                                                   f'The answer is:\n🔥 "{word[1]}" 🔥')
 
             update_user_score(message)
@@ -674,8 +674,8 @@ def check_answer(message, word, category, level):
             time.sleep(3)
             play_again = random.choice(play_again_phrases)
             bot.send_message(message.chat.id,
-                             f"😎 {play_again}\n"
-                             "✅ Enter 'y'\n")
+                             f"😎 {play_again}\n\n"
+                             "✅ Press /yes\n")
             bot.register_next_step_handler(message, continue_game, category, level)
 
         else:
