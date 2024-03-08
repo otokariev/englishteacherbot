@@ -191,7 +191,15 @@ def sort_scores(message, scores):
     for user_id_username, score in sorted_scores:
         user_id = user_id_username.split('_')[0]
         user = bot.get_chat_member(message.chat.id, user_id).user
-        username = f"{user.first_name} {user.last_name}"
+
+        if user.first_name and user.last_name:
+            username = f'{user.first_name} {user.last_name}'
+        elif user.first_name or user.last_name:
+            last_name = user.last_name if user.last_name else ''
+            username = f"{user.first_name} {last_name}"
+        else:
+            username = f'{user.username}'
+
         score_list += f"{username}: {score}\n"
 
     return score_list

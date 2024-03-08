@@ -159,5 +159,11 @@
     "РАКЕТА": "ROCKET",
     "ЛУНА": "MOON",
     "ПЛАНЕТА": "PLANET",
-    "ШЛЕМ": "HELMET SLAM"
+    "ШЛЕМ": "HELMET SLAM",
+    "ПОДБОРОДОК": "CHIN",
+    "ЖИВОТ": "BELLY",
+    "ПОЛКА": "SHELVE",
+    "НИТЬ": "THREAD",
+    "ТУМАН": "FOG",
+    "ПРУД": "POND"
 }
