@@ -337,7 +337,7 @@ def get_menu(message):
 
         if message.from_user.id == ADMIN:
             bot.send_message(message.chat.id,
-                             f'Welcome to admin menu 🇬🇧\n\n'
+                             f'🇺🇸 Welcome to admin menu 🇬🇧\n\n'
                              '🚀 Start is here 👉 /play 👈\n'
                              '🥇 Check the score 👉 /top 👈\n'
                              # '📌 Add new word 👉 /add 👈\n'
@@ -350,7 +350,7 @@ def get_menu(message):
 
         elif message.from_user.id in MODERATOR_LIST:
             bot.send_message(message.chat.id,
-                             f'Welcome to moderator menu 🇬🇧\n\n'
+                             f'🇺🇸 Welcome to moderator menu 🇬🇧\n\n'
                              '🚀 Start is here 👉 /play 👈\n'
                              '🥇 Check the score 👉 /top 👈\n'
                              # '📌 Add new word 👉 /add 👈\n'
@@ -359,12 +359,12 @@ def get_menu(message):
 
         else:
             bot.send_message(message.chat.id,
-                             'Welcome to bot menu 🇬🇧\n\n'
+                             '🇺🇸 Welcome to bot menu 🇬🇧\n\n'
                              '🚀 Start is here 👉 /play 👈\n')
 
     else:
         bot.send_message(message.chat.id,
-                         f'Welcome to bot menu 🇬🇧\n\n'
+                         f'🇺🇸 Welcome to bot menu 🇬🇧\n\n'
                          '🚀 Start is here 👉 /play 👈\n'
                          '🥇 Check the score 👉 /top 👈\n')
 
@@ -533,15 +533,13 @@ def get_hint1(message, word):
         starred_list = ['*' * item for item in len_list]
         hint = (translation[0][:1] + starred_list[0][1:], *starred_list[1:])
         hint_str = ' '.join(map(str, hint))
-        bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
-                                          f"/skip  /stop")
+        bot.send_message(message.chat.id, f"✨ {hint_str} ✨")
     else:
         translation = word[1]
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:1] + starred_list[1:]
-        bot.send_message(message.chat.id, f"✨ {hint} ✨\n\n"
-                                          f"/skip  /stop")
+        bot.send_message(message.chat.id, f"✨ {hint} ✨")
 
 
 def get_hint2(message, word):
@@ -552,20 +550,17 @@ def get_hint2(message, word):
         if len_list[0] == 1:
             hint = translation[0], translation[1][:1] + starred_list[1][1:], *starred_list[2:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
-                                              f"/skip  /stop")
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨")
         else:
             hint = translation[0][:2] + starred_list[0][2:], *starred_list[1:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
-                                              f"/skip  /stop")
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨")
     else:
         translation = word[1]
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:2] + starred_list[2:]
-        bot.send_message(message.chat.id, f"✨ {hint} ✨\n\n"
-                                          f"/skip  /stop")
+        bot.send_message(message.chat.id, f"✨ {hint} ✨")
 
 
 def get_hint3(message, word):
@@ -576,43 +571,38 @@ def get_hint3(message, word):
         if len_list[0] == 1:
             hint = translation[0], translation[1][:2] + starred_list[1][2:], *starred_list[2:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
-                                              f"/skip  /stop")
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨")
         elif len_list[0] == 2:
             hint = translation[0], translation[1][:1] + starred_list[1][1:], *starred_list[2:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
-                                              f"/skip  /stop")
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨")
         else:
             hint = translation[0][:3] + starred_list[0][3:], *starred_list[1:]
             hint_str = ' '.join(map(str, hint))
-            bot.send_message(message.chat.id, f"✨ {hint_str} ✨\n\n"
-                                              f"/skip  /stop")
+            bot.send_message(message.chat.id, f"✨ {hint_str} ✨")
     else:
         translation = word[1]
         len_list = len(translation)
         starred_list = '*' * len_list
         hint = translation[:3] + starred_list[3:]
-        bot.send_message(message.chat.id, f"✨ {hint} ✨\n\n"
-                                          f"/skip  /stop")
+        bot.send_message(message.chat.id, f"✨ {hint} ✨")
 
 
 def run_timeout(message, word, category, level):
     global game
 
+    game = False
+    play_again = random.choice(play_again_phrases)
+
     if len(word) > 2:
         bot.send_message(message.chat.id, f'The correct translation is:\n✨ {word[1]} ✨\n\n'
                                           f'♾ Synonyms:\n'
-                                          f'{word[2]}')
+                                          f'{word[2]}\n\n'
+                                          f'😎 {play_again}\n✅ Press /yes')
     else:
-        bot.send_message(message.chat.id, f"The correct translation is:\n✨ {word[1]} ✨")
+        bot.send_message(message.chat.id, f'The correct translation is:\n✨ {word[1]} ✨\n\n'
+                                          f'😎 {play_again}\n✅ Press /yes')
 
-    game = False
-    time.sleep(1)
-    play_again = random.choice(play_again_phrases)
-    bot.send_message(message.chat.id,
-                     f"😎 {play_again}\n\n"
-                     "✅ Press /yes\n")
     bot.register_next_step_handler(message, continue_game, category, level)
 
 
@@ -657,28 +647,33 @@ def check_answer(message, word, category, level):
         elif message.content_type == 'text' \
                 and not message.text.startswith('/') \
                 and answer.text.strip().lower() == word[1].lower():
-            first_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
-            last_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.last_name
-            player = f'{first_name} {last_name}'
-            win = random.choice(win_phrases)
 
-            if len(word) > 2:
-                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n\n'
-                                                  f'The answer is:\n🔥 "{word[1]}" 🔥\n\n'
-                                                  f'♾ Synonyms:\n'
-                                                  f'{word[2]}')
-            else:
-                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n\n'
-                                                  f'The answer is:\n🔥 "{word[1]}" 🔥')
-
-            update_user_score(message)
+            game = False
 
             hint1.cancel()
             hint2.cancel()
             hint3.cancel()
             timeout.cancel()
 
-            game = False
+            first_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.first_name
+            last_name = bot.get_chat_member(message.chat.id, message.from_user.id).user.last_name
+            player = f'{first_name} {last_name}'
+            win = random.choice(win_phrases)
+            play_again = random.choice(play_again_phrases)
+
+            if len(word) > 2:
+                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n\n'
+                                                  f'The answer is:\n🔥 "{word[1]}" 🔥\n\n'
+                                                  f'♾ Synonyms:\n'
+                                                  f'{word[2]}\n\n'
+                                                  f'😎 {play_again}\n✅ Press /yes')
+            else:
+                bot.send_message(message.chat.id, f'🎯 {win}, {player}! 🎯\n\n'
+                                                  f'The answer is:\n🔥 "{word[1]}" 🔥\n\n'
+                                                  f'😎 {play_again}\n✅ Press /yes')
+
+            update_user_score(message)
+
             time.sleep(3)
             play_again = random.choice(play_again_phrases)
             bot.send_message(message.chat.id,
