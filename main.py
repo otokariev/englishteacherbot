@@ -39,7 +39,7 @@ GROUP_MEETING = 'group/chat_-1002046915616_scores.json'
 
 win_phrases = ['Good job', 'Well done', 'Congrats', 'Hooray', 'Cheers', 'Bravo']
 play_phrases = ['Ok!', 'No problem!', 'Great!', "Let's do it!"]
-play_again_phrases = ['Another word?', 'PLay again?', 'More?', 'Play more?', 'Another round?']
+play_again_phrases = ['Another word?', 'Play again?', 'More?', 'Play more?', 'Another round?']
 
 ADMIN = 361816009
 MODERATOR_LIST = [517905016]
@@ -676,9 +676,6 @@ def check_answer(message, word, category, level):
 
             time.sleep(3)
             play_again = random.choice(play_again_phrases)
-            bot.send_message(message.chat.id,
-                             f"😎 {play_again}\n\n"
-                             "✅ Press /yes\n")
             bot.register_next_step_handler(message, continue_game, category, level)
 
         else:
