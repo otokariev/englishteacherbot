@@ -57,7 +57,7 @@ except FileNotFoundError:
     advanced_dict = {}
 
 
-def send_message_and_delete(chat_id, text, delay=5):
+def send_message_and_delete(chat_id, text, delay=60):
     bot_message = bot.send_message(chat_id, text)
 
     def delete_message():
@@ -68,7 +68,7 @@ def send_message_and_delete(chat_id, text, delay=5):
     threading.Thread(target=delete_message).start()
 
 
-def delete_user_command(message, delay=5):
+def delete_user_command(message, delay=60):
 
     def delete_message():
         time.sleep(delay)
