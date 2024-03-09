@@ -675,7 +675,6 @@ def check_answer(message, word, category, level):
             update_user_score(message)
 
             time.sleep(3)
-            play_again = random.choice(play_again_phrases)
             bot.register_next_step_handler(message, continue_game, category, level)
 
         else:
