@@ -26,6 +26,8 @@ async def webhook(request: Request):
     return 'ok'
 
 
+bot_name = '@whiamibot'
+
 hint1: threading.Timer | None
 hint2: threading.Timer | None
 hint3: threading.Timer | None
@@ -442,8 +444,13 @@ def choose_dict_category(message):
 def valid_dict_category(message):
     delete_user_command(message)
     if (message.content_type == 'text'
-            and message.text in ['/public', '/private']):
-        category = message.text
+            and message.text in ['/public', '/private',
+                                 f'/public{bot_name}', f'/private{bot_name}']):
+        if bot_name in message.text:
+            category = message.text.split('@')[0]
+        else:
+            category = message.text
+
         send_message_and_delete(message.chat.id, f'✅ You have chosen category:\n'
                                                  f'✨ {category.upper()[1:]} ✨')
         time.sleep(2)
@@ -472,8 +479,14 @@ def choose_dict_level(message, category):
 def valid_dict_level(message, category):
     delete_user_command(message)
     if (message.content_type == 'text'
-            and message.text in ['/basic', '/advanced', '/insane']):
-        level = message.text
+            and message.text in ['/basic', '/advanced', '/insane',
+                                 f'/basic{bot_name}', f'/advanced{bot_name}', f'/insane{bot_name}']):
+
+        if bot_name in message.text:
+            level = message.text.split('@')[0]
+        else:
+            level = message.text
+
         send_message_and_delete(message.chat.id, f'✅ You have chosen level:\n'
                                                  f'✨ {level.upper()[1:]} ✨')
         time.sleep(2)
@@ -665,7 +678,7 @@ def check_answer(message, word, category, level):
         answer = message
 
         if message.content_type == 'text' \
-                and message.text.lower() == '/skip':
+                and message.text.lower() in ['/skip', f'/skip{bot_name}']:
             hint1.cancel()
             hint2.cancel()
             hint3.cancel()
@@ -674,7 +687,7 @@ def check_answer(message, word, category, level):
             get_dict_category_and_level(message, category, level)
 
         elif message.content_type == 'text' \
-                and message.text.lower() == '/stop':
+                and message.text.lower() in ['/stop', f'/stop{bot_name}']:
             hint1.cancel()
             hint2.cancel()
             hint3.cancel()
