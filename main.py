@@ -79,7 +79,7 @@ def delete_user_command(message, delay=60):
         try:
             bot.delete_message(message.chat.id, message.message_id)
         except Exception as ex:
-            send_message_and_delete(ADMIN, f'Deleting user message error:\n\n{ex}')
+            bot.send_message(ADMIN, f'Deleting user message error:\n\n{ex}')
 
     threading.Thread(target=delete_message).start()
 
@@ -286,7 +286,7 @@ def update_user_score(message):
 
     from_chat = message.chat.id
     updated_scores = scores
-    send_message_and_delete(ADMIN, f'Updated score from chat:\n\n{from_chat}\n\n{updated_scores}')
+    bot.send_message(ADMIN, f'Updated score from chat:\n\n{from_chat}\n\n{updated_scores}')
 
     with open(score_file, "w", encoding="utf-8") as file:
         json.dump(scores, file, ensure_ascii=False, indent=4)
@@ -453,7 +453,7 @@ def valid_dict_category(message):
 
         send_message_and_delete(message.chat.id, f'✅ You have chosen category:\n'
                                                  f'✨ {category.upper()[1:]} ✨')
-        time.sleep(2)
+        time.sleep(0.5)
 
         if category == '/public':
             choose_dict_level(message, category)
@@ -489,7 +489,7 @@ def valid_dict_level(message, category):
 
         send_message_and_delete(message.chat.id, f'✅ You have chosen level:\n'
                                                  f'✨ {level.upper()[1:]} ✨')
-        time.sleep(2)
+        time.sleep(0.5)
         get_dict_category_and_level(message, category, level)
     else:
         send_message_and_delete(message.chat.id, '⛔ Wrong command.\n'
@@ -554,11 +554,11 @@ def start_game(message, word, category, level):
     delete_user_command(message)
     global hint1, hint2, hint3, timeout, game
     send_message_and_delete(message.chat.id, '⏳ Looking for a new word ⌛')
+    time.sleep(0.5)
 
     game = True
 
     if game:
-        time.sleep(2)
 
         play = random.choice(play_phrases)
         send_message_and_delete(message.chat.id, f"{play} 😎\nTranslate the word, please:\n\n✨ {word[0]} ✨\n"
@@ -662,7 +662,7 @@ def run_timeout(message, word, category, level):
 def continue_game(message, category, level):
     delete_user_command(message)
     if message.content_type == 'text' \
-            and message.text.lower() == '/yes':
+            and message.text.lower() in ['/yes', f'/yes{bot_name}']:
         get_dict_category_and_level(message, category, level)
     else:
         send_message_and_delete(message.chat.id,
@@ -729,7 +729,6 @@ def check_answer(message, word, category, level):
 
             update_user_score(message)
 
-            time.sleep(3)
             bot.register_next_step_handler(message, continue_game, category, level)
 
         else:
