@@ -79,7 +79,7 @@ def delete_user_command(message, delay=60):
         try:
             bot.delete_message(message.chat.id, message.message_id)
         except Exception as ex:
-            bot.send_message(ADMIN, f'Deleting user message error:\n\n{ex}')
+            send_message_and_delete(ADMIN, f'Deleting user message error:\n\n{ex}')
 
     threading.Thread(target=delete_message).start()
 
@@ -207,7 +207,7 @@ def view_words(message):
 #         bot.send_message(message.chat.id, 'Enter text only!\nBack to dev menu ⭐ /dev ⭐')
 
 
-@bot.message_handler(commands=['group_id'])
+@bot.message_handler(commands=['chat_id'])
 def get_group_id(message):
     delete_user_command(message)
     send_message_and_delete(message.from_user.id, f'{message.chat.title}\n{message.chat.id}')
@@ -313,7 +313,7 @@ def is_champion(message, last_scores, updated_scores):
                                                  f'💥 {new_champion} 💥')
 
 
-@bot.message_handler(commands=['edit_user'])
+@bot.message_handler(commands=['edit_score'])
 def edit_user_score(message):
     delete_user_command(message)
     send_message_and_delete(message.chat.id, "Please enter the username:")
@@ -767,7 +767,7 @@ def check_server():
 def check(message):
     delete_user_command(message)
     try:
-        send_message_and_delete(message.chat.id, 'Function check_server has been started successfully.')
+        bot.send_message(message.chat.id, 'Function check_server has been started successfully.')
         check_server()
     except Exception as e:
-        send_message_and_delete(message.chat.id, f"An error occurred:\n{str(e)}")
+        bot.send_message(message.chat.id, f"An error occurred:\n{str(e)}")
