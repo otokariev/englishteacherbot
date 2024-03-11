@@ -310,7 +310,8 @@ def is_champion(message, last_scores, updated_scores):
             and new_champion_score > last_champion_score):
         send_message_and_delete(message.chat.id, f'🎉 Congrats! 🎉\n'
                                                  f'The new champion is:\n'
-                                                 f'💥 {new_champion} 💥')
+                                                 f'💥 {new_champion} 💥',
+                                delay=86400)
 
 
 @bot.message_handler(commands=['edit_score'])
