@@ -313,9 +313,7 @@ def is_champion(message, last_scores, updated_scores):
                                 delay=86400)
 
 
-@bot.message_handler(commands=['champion'])
 def get_champion(message):
-    delete_user_command(message)
 
     champion_score = get_top_dict(message)[0]
     champion_id_name = next(iter(champion_score))
@@ -426,6 +424,7 @@ def hello(message):
                             'Hello! 😎\nI am a English teacher bot 🇬🇧\n'
                             'If you want to learn some new words,\njust press /play and try me 😉\n'
                             'Bot menu: ⭐ /menu ⭐')
+    get_champion(message)
 
 
 def get_or_create_private_dict(message):
@@ -784,12 +783,3 @@ def check(message):
         check_server()
     except Exception as e:
         bot.send_message(message.chat.id, f"An error occurred:\n{str(e)}")
-
-
-@bot.message_handler(commands=['run'])
-def run(message):
-    try:
-        check(message)
-        get_champion(message)
-    except Exception as ex:
-        send_message_and_delete(ADMIN, f'Run function error:\n\n{ex}')
