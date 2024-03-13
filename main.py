@@ -60,7 +60,7 @@ except FileNotFoundError:
 
 
 def send_message_and_delete(chat_id, text, delay=60):
-    bot_message = bot.send_message(chat_id, text)
+    bot_message = bot.send_message(chat_id, text, parse_mode='HTML')
 
     def delete_message():
         time.sleep(delay)
@@ -245,7 +245,6 @@ def get_top_dict(message):
         top_list = {}
 
     sorted_top_dict = dict(sorted(top_list.items(), key=lambda x: x[1], reverse=True))
-    delete_user_command(message)
 
     return sorted_top_dict, score_file
 
@@ -312,6 +311,19 @@ def is_champion(message, last_scores, updated_scores):
                                                  f'The new champion is:\n'
                                                  f'💥 {new_champion} 💥',
                                 delay=86400)
+
+
+@bot.message_handler(commands=['champion'])
+def get_champion(message):
+    delete_user_command(message)
+
+    champion_score = get_top_dict(message)[0]
+    champion_id_name = next(iter(champion_score))
+    champion_name = champion_id_name.split('_')[1]
+
+    send_message_and_delete(message.chat.id, f'⚔ The champion is ⚔\n\n'
+                                             f'🥇 <b><i><u>{champion_name}</u></i></b> 🥇', 3600)
+    threading.Timer(3600, get_champion, args=[message]).start()
 
 
 @bot.message_handler(commands=['edit_score'])
@@ -754,7 +766,7 @@ def check_server():
     # text_data = get_json_data(score_url)
     get_json_data(score_url)
 
-    # bot.send_message(ADMIN, ' 200 ok')
+    # bot.send_message(ADMIN, '200 ok')
 
     # if text_data:
     #     bot.send_message(ADMIN, f'JSON data received successfully:\n{text_data}')
@@ -768,7 +780,16 @@ def check_server():
 def check(message):
     delete_user_command(message)
     try:
-        bot.send_message(message.chat.id, 'Function check_server has been started successfully.')
+        bot.send_message(ADMIN, 'Function check has been started successfully.')
         check_server()
     except Exception as e:
         bot.send_message(message.chat.id, f"An error occurred:\n{str(e)}")
+
+
+@bot.message_handler(commands=['run'])
+def run(message):
+    try:
+        check(message)
+        get_champion(message)
+    except Exception as ex:
+        send_message_and_delete(ADMIN, f'Run function error:\n\n{ex}')
