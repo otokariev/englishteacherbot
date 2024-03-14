@@ -72,7 +72,6 @@ def send_message_and_delete(chat_id, text, delay=60):
 
 
 def delete_user_command(message, delay=60):
-
     def delete_message():
         time.sleep(delay)
 
@@ -316,7 +315,7 @@ def is_champion(message, last_scores, updated_scores):
 def get_champion(message):
     global champion_timer
 
-    champion_score = get_top_dict(message)[0]
+    champion_score, score_file = get_top_dict(message)
     champion_id_name = next(iter(champion_score))
     champion_name = champion_id_name.split('_')[1]
 
@@ -427,9 +426,11 @@ def hello(message):
                             'Hello! 😎\nI am a English teacher bot 🇬🇧\n'
                             'If you want to learn some new words,\njust press /play and try me 😉\n'
                             'Bot menu: ⭐ /menu ⭐')
+
     if champion_timer:
         champion_timer.cancel()
-    get_champion(message)
+    if message.chat.id == -1002046915616:
+        get_champion(message)
 
 
 def get_or_create_private_dict(message):
@@ -576,7 +577,6 @@ def start_game(message, word, category, level):
     game = True
 
     if game:
-
         play = random.choice(play_phrases)
         send_message_and_delete(message.chat.id, f"{play} 😎\nTranslate the word, please:\n\n✨ {word[0]} ✨\n"
                                                  f"🔹 {len(word[1])} letters 🔹\n\n"
