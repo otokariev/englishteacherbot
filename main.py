@@ -321,8 +321,8 @@ def get_champion(message):
     champion_name = champion_id_name.split('_')[1]
 
     send_message_and_delete(message.chat.id, f'⚔ The champion is ⚔\n\n'
-                                             f'🥇 <b><i><u>{champion_name}</u></i></b> 🥇', 3600)
-    champion_timer = threading.Timer(3600, get_champion, args=[message])
+                                             f'🥇 <b><i><u>{champion_name}</u></i></b> 🥇')
+    champion_timer = threading.Timer(300, get_champion, args=[message])
     champion_timer.start()
 
 
