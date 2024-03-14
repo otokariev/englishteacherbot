@@ -32,6 +32,7 @@ hint1: threading.Timer | None
 hint2: threading.Timer | None
 hint3: threading.Timer | None
 timeout: threading.Timer | None
+champion_timer: threading.Timer | None = None
 
 game = False
 
@@ -309,11 +310,11 @@ def is_champion(message, last_scores, updated_scores):
             and new_champion_score > last_champion_score):
         send_message_and_delete(message.chat.id, f'🎉 Congrats! 🎉\n'
                                                  f'The new champion is:\n'
-                                                 f'💥 {new_champion} 💥',
-                                delay=86400)
+                                                 f'💥 {new_champion} 💥')
 
 
 def get_champion(message):
+    global champion_timer
 
     champion_score = get_top_dict(message)[0]
     champion_id_name = next(iter(champion_score))
@@ -321,7 +322,8 @@ def get_champion(message):
 
     send_message_and_delete(message.chat.id, f'⚔ The champion is ⚔\n\n'
                                              f'🥇 <b><i><u>{champion_name}</u></i></b> 🥇', 3600)
-    threading.Timer(3600, get_champion, args=[message]).start()
+    champion_timer = threading.Timer(3600, get_champion, args=[message])
+    champion_timer.start()
 
 
 @bot.message_handler(commands=['edit_score'])
@@ -419,11 +421,14 @@ def get_menu(message):
 
 @bot.message_handler(commands=['start'])
 def hello(message):
+    global champion_timer
     delete_user_command(message)
     send_message_and_delete(message.chat.id,
                             'Hello! 😎\nI am a English teacher bot 🇬🇧\n'
                             'If you want to learn some new words,\njust press /play and try me 😉\n'
                             'Bot menu: ⭐ /menu ⭐')
+    if champion_timer:
+        champion_timer.cancel()
     get_champion(message)
 
 
